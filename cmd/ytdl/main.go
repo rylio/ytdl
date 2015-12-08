@@ -122,6 +122,7 @@ func handler(identifier string, options options) {
 	}
 	log.SetOutput(logOut)
 
+	// ouput only errors or not
 	silent := options.outputFile == "" || options.silent || options.infoOnly || options.downloadURL
 	if silent {
 		log.SetLevel(log.FatalLevel)
@@ -193,6 +194,7 @@ func handler(identifier string, options options) {
 			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
 			return
 		}
+		// Create file truncate if append flag is not set
 		flags := os.O_CREATE | os.O_WRONLY
 		if options.append {
 			flags |= os.O_APPEND
@@ -200,6 +202,7 @@ func handler(identifier string, options options) {
 			flags |= os.O_TRUNC
 		}
 		var f *os.File
+		// open as write only
 		f, err = os.OpenFile(fileName, flags, 0666)
 		if err != nil {
 			err = fmt.Errorf("Unable to open output file: %s", err.Error())
@@ -212,6 +215,7 @@ func handler(identifier string, options options) {
 	log.Info("Downloading to ", out.(*os.File).Name())
 	var req *http.Request
 	req, err = http.NewRequest("GET", downloadURL.String(), nil)
+	// if byte range flag is set, use http range header option
 	if options.byteRange != "" {
 		req.Header.Set("Range", "bytes="+options.byteRange)
 	}
