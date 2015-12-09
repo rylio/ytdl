@@ -10,7 +10,7 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/codegangsta/cli"
 	"github.com/mattn/go-isatty"
-	"github.com/otium/ytdl.go"
+	"github.com/otium/ytdl"
 )
 
 type options struct {

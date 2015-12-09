@@ -4,6 +4,7 @@
 Go library for downloading YouTube videos
 
 [Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/ytdl "ytdl")
+
 ## Example
 ```
 import (
@@ -53,8 +54,6 @@ To install: ``go get -u github.com/otium/ytdl/...``
  - ```--range, -r``` - specify a range of bytes, placed in http range header, ex: 0-100
  - ```--download-url``` - just print download url to, don't do anything else
  - ```--verion, -v``` - print out ytdl cli version
-
-
 
 ## License
 ytdl is released under the MIT License, see LICENSE for more details.
