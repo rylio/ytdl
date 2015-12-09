@@ -8,29 +8,38 @@ Go library for downloading YouTube videos
 ## ytdl CLI
 
 To install: ``go get -u github.com/otium/ytdl/...``
-```
-NAME:
-   ytdl - Download youtube videos
 
-USAGE:
-   ytdl [global options] [youtube url or video id]
-
-VERSION:
-   0.0.1
-
-GLOBAL OPTIONS:
-   --help, -h						show help
-   --output, -o "{{.Title}}.{{.Ext}}"			Write output to a file, passing - outputs to stdout
-   --info, -i						Only output video info
-   --no-progress					Disable the progress bar
-   --silent, -s						Only output errors, also disables progress bar
-   --debug, -d						Output debug log
-   --append, -a						Append to output file instead of overwriting
-   --filter, -f [--filter option --filter option]	Filter available formats, syntax: [format_key]:val1,val2
-   --range, -r 						Download a specific range of bytes of the video, [start]-[end]
-   --download-url, -u					Prints download url to stdout
-   --version, -v					print the version
-```
+### Usage
+``` ytdl [global options] [youtube url or video id] ```
+### Options
+ - ```--help, -h``` - show help
+ - ```--filter, -f``` - Filter out formats
+   - Syntax: key:value1,value2,...,valueN
+   - To exclude: !key:value1,...
+   - Available keys (See format.go for available values):
+      - ```ext``` - extension of video
+      - ```res``` - resolution of video
+      - ```videnc``` - video encoding
+      - ```audenc``` - audio encoding
+      - ```prof``` - youtube video profile
+   - Default filters
+      - ```ext:mp4```
+      - ```res:1080p,720p,480p,360p,240p,144p```
+      - ```!videnc:nil```
+      - ```!audenc:nil```
+ - ```--output, -o``` - Output to specific path
+   - Supports templates, ex: {{.Title}}.{{.Ext}}
+   - Defaults to ```{{.Title}}.{{.Ext}}```
+   - Supported template variables are Title, Ext, DatePublished, Resolution
+   - Pass - to output to stdout, former stdout output is redirected to stderr
+ - ```--info, -i``` - Just gets video info, outputs to stdout
+ - ```--no-progress``` - Disables the progress bar
+ - ```--silent, -s``` - Disables all output, except for fatal errors
+ - ```--debug, -d``` - Output debug logs
+ - ```--append, -a``` - append to output file, instead of truncating
+ - ```--range, -r``` - specify a range of bytes, placed in http range header, ex: 0-100
+ - ```--download-url``` - just print download url to, don't do anything else
+ - ```--verion, -v``` - print out ytdl cli version
 
 ## Example
 ```
