@@ -4,6 +4,19 @@
 Go library for downloading YouTube videos
 
 [Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/ytdl "ytdl")
+## Example
+```
+import (
+   "github.com/otium/ytdl"
+   "os"
+)
+
+info, err := ytdl.GetInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
+file, _ = os.Create(info.Title + ".mp4")
+defer file.Close()
+info.Download(file)
+
+```
 
 ## ytdl CLI
 
@@ -41,19 +54,7 @@ To install: ``go get -u github.com/otium/ytdl/...``
  - ```--download-url``` - just print download url to, don't do anything else
  - ```--verion, -v``` - print out ytdl cli version
 
-## Example
-```
-import (
-   "github.com/otium/ytdl"
-   "os"
-)
 
-info, err := ytdl.GetInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
-file, _ = os.Create(info.Title + ".mp4")
-defer file.Close()
-info.Download(file)
-
-```
 
 ## License
 ytdl is released under the MIT License, see LICENSE for more details.
