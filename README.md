@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/otium/ytdl.go.svg)](https://travis-ci.org/otium/ytdl.go)
-# ytdl
+
+# ytdl [![Build Status](https://travis-ci.org/otium/ytdl.go.svg)](https://travis-ci.org/otium/ytdl.go) [![GoDoc](https://godoc.org/github.com/codegangsta/cli?status.svg)](https://godoc.org/github.com/otium/ytdl.go)
 ------
 Go library for downloading YouTube videos
 
