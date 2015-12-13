@@ -136,7 +136,6 @@ func handler(identifier string, options options) {
 	log.Info("Fetching video info...")
 	//fmt.Print("\u001b[0G")
 	//fmt.Print("\u001b[2K")
-	//fmt.Print("hi")
 	info, err := ytdl.GetInfo(identifier)
 	if err != nil {
 		err = fmt.Errorf("Unable to fetch video info: %s", err.Error())
@@ -147,8 +146,9 @@ func handler(identifier string, options options) {
 	// TODO: Allow json output
 	if options.infoOnly {
 		fmt.Println("Title:", info.Title)
-		fmt.Println("Date Published: ", info.DatePublished.Format("Jan 2 2006"))
-		fmt.Println("Description:", info.Description)
+		fmt.Println("Author:", info.Author)
+		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
+		fmt.Println("Duration:", info.Duration)
 		return
 	}
 
@@ -189,6 +189,8 @@ func handler(identifier string, options options) {
 			Ext:           format[ytdl.FormatExtensionKey].(string),
 			DatePublished: info.DatePublished.Format("2006-01-02"),
 			Resolution:    format[ytdl.FormatResolutionKey].(string),
+			Author:        info.Author,
+			Duration:      info.Duration.String(),
 		})
 		if err != nil {
 			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
