@@ -53,7 +53,7 @@ To install: ``go get -u github.com/otium/ytdl/...``
  - ```--append, -a``` - append to output file, instead of truncating
  - ```--range, -r``` - specify a range of bytes, placed in http range header, ex: 0-100
  - ```--download-url``` - just print download url to, don't do anything else
- - ```--verion, -v``` - print out ytdl cli version
+ - ```--version, -v``` - print out ytdl cli version
 
 ## License
 ytdl is released under the MIT License, see LICENSE for more details.
