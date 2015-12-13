@@ -35,6 +35,8 @@ type Info struct {
 	Formats []Format `json:"formats"`
 	// List of keywords associated with the video
 	Keywords []string `json:"keywords"`
+	// Author of the video
+	Author string `json:"author"`
 
 	//TODO: Add author
 	htmlPlayerFile string
@@ -177,6 +179,9 @@ func getInfoFromHTML(id string, html []byte) (*Info, error) {
 	if status, ok := inf["status"].(string); ok && status == "fail" {
 		return nil, fmt.Errorf("Error %d:%s", inf["errorcode"], inf["reason"])
 	}
+	if a, ok := inf["author"].(string); ok {
+		info.Author = a
+	}
 	/*
 		// For the future maybe
 		parseKey := func(key string) []string {
@@ -204,8 +209,6 @@ func getInfoFromHTML(id string, html []byte) (*Info, error) {
 			vals := []string{}
 			for _, v := range fmtList {
 				vals = append(vals, strings.Split(v, "/")...)
-			}
-			fmtList = vals
 		} else {
 			info["fmt_list"] = []string{}
 		}
@@ -221,6 +224,7 @@ func getInfoFromHTML(id string, html []byte) (*Info, error) {
 			}
 		}
 	*/
+
 	var formatStrings []string
 	if fmtStreamMap, ok := inf["url_encoded_fmt_stream_map"].(string); ok {
 		formatStrings = append(formatStrings, strings.Split(fmtStreamMap, ",")...)
