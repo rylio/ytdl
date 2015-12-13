@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"encoding/json"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/cheggaaa/pb"
 	"github.com/codegangsta/cli"
@@ -23,6 +25,7 @@ type options struct {
 	filters     []string
 	downloadURL bool
 	byteRange   string
+	json        bool
 }
 
 func main() {
@@ -80,6 +83,10 @@ func main() {
 			Name:  "download-url, u",
 			Usage: "Prints download url to stdout",
 		},
+		cli.BoolFlag{
+			Name:  "json, j",
+			Usage: "Print info json to stdout",
+		},
 	}
 
 	app.Action = func(c *cli.Context) {
@@ -97,6 +104,7 @@ func main() {
 				filters:     c.StringSlice("filter"),
 				downloadURL: c.Bool("download-url"),
 				byteRange:   c.String("range"),
+				json:        c.Bool("json"),
 			}
 			handler(identifier, options)
 		}
@@ -123,7 +131,7 @@ func handler(identifier string, options options) {
 	log.SetOutput(logOut)
 
 	// ouput only errors or not
-	silent := options.outputFile == "" || options.silent || options.infoOnly || options.downloadURL
+	silent := options.outputFile == "" || options.silent || options.infoOnly || options.downloadURL || options.json
 	if silent {
 		log.SetLevel(log.FatalLevel)
 	} else if options.debug {
@@ -149,6 +157,15 @@ func handler(identifier string, options options) {
 		fmt.Println("Author:", info.Author)
 		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
 		fmt.Println("Duration:", info.Duration)
+		return
+	} else if options.json {
+		var data []byte
+		data, err = json.MarshalIndent(info, "", "\t")
+		if err != nil {
+			err = fmt.Errorf("Unable to marshal json: %s", err.Error())
+			return
+		}
+		fmt.Println(string(data))
 		return
 	}
 
