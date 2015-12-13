@@ -37,6 +37,8 @@ type Info struct {
 	Keywords []string `json:"keywords"`
 	// Author of the video
 	Author string `json:"author"`
+	// Duration of the video
+	Duration time.Duration
 
 	//TODO: Add author
 	htmlPlayerFile string
@@ -181,6 +183,18 @@ func getInfoFromHTML(id string, html []byte) (*Info, error) {
 	}
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
+	} else {
+		log.Warn("Unable to extract author")
+	}
+
+	if length, ok := inf["length_seconds"].(string); ok {
+		if duration, err := strconv.ParseInt(length, 10, 64); err == nil {
+			info.Duration = time.Second * time.Duration(duration)
+		} else {
+			log.Warn("Unable to parse duration string: ", length)
+		}
+	} else {
+		log.Warn("Unable to extract duration")
 	}
 	/*
 		// For the future maybe
