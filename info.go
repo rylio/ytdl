@@ -24,17 +24,17 @@ const youtubeDateFormat = "2006-01-02"
 // Info contains the info a youtube video
 type Info struct {
 	// The video ID
-	ID string
+	ID string `json:"id"`
 	// The video title
-	Title string
+	Title string `json:"title"`
 	// The video description
-	Description string
+	Description string `json:"description"`
 	// The date the video was published
-	DatePublished time.Time
+	DatePublished time.Time `json:"datePublished"`
 	// Formats the video is available in
-	Formats []Format
+	Formats []Format `json:"formats"`
 	// List of keywords associated with the video
-	Keywords []string
+	Keywords []string `json:"keywords"`
 
 	//TODO: Add author
 	htmlPlayerFile string
