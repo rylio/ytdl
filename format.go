@@ -10,6 +10,7 @@ const (
 	FormatVideoEncodingKey FormatKey = "videnc"
 	FormatAudioEncodingKey FormatKey = "audenc"
 	FormatProfileKey       FormatKey = "prof"
+	FormatItagKey          FormatKey = "itag"
 )
 
 // Format is a map type for formats
@@ -23,6 +24,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "Sorenson H.283",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "mp3",
+		FormatItagKey:          5,
 	},
 	6: {
 		FormatExtensionKey:     "flv",
@@ -30,6 +32,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "Sorenson H.263",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "mp3",
+		FormatItagKey:          6,
 	},
 	13: {
 		FormatExtensionKey:     "3gp",
@@ -37,6 +40,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "MPEG-4 Visual",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          13,
 	},
 	17: {
 		FormatExtensionKey:     "3gp",
@@ -44,6 +48,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "MPEG-4 Visual",
 		FormatAudioEncodingKey: "aac",
 		FormatProfileKey:       nil,
+		FormatItagKey:          17,
 	},
 	18: {
 		FormatExtensionKey:     "mp4",
@@ -51,6 +56,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "baseline",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          18,
 	},
 	22: {
 		FormatExtensionKey:     "mp4",
@@ -58,6 +64,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          22,
 	},
 	34: {
 		FormatExtensionKey:     "flv",
@@ -65,6 +72,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          34,
 	},
 	35: {
 		FormatExtensionKey:     "flv",
@@ -72,6 +80,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          35,
 	},
 	36: {
 		FormatExtensionKey:     "3gp",
@@ -79,6 +88,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "MPEG-4 Visual",
 		FormatProfileKey:       "simple",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          36,
 	},
 	37: {
 		FormatExtensionKey:     "mp4",
@@ -86,6 +96,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          37,
 	},
 	38: {
 		FormatExtensionKey:     "mp4",
@@ -93,6 +104,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          38,
 	},
 	43: {
 		FormatExtensionKey:     "webm",
@@ -100,6 +112,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          43,
 	},
 	44: {
 		FormatExtensionKey:     "webm",
@@ -107,6 +120,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          44,
 	},
 	45: {
 		FormatExtensionKey:     "webm",
@@ -114,6 +128,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          45,
 	},
 	46: {
 		FormatExtensionKey:     "webm",
@@ -121,12 +136,14 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          46,
 	},
 	82: {
 		FormatExtensionKey:     "mp4",
 		FormatResolutionKey:    "360p",
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "3d",
+		FormatItagKey:          82,
 	},
 	83: {
 		FormatExtensionKey:     "mp4",
@@ -134,6 +151,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          83,
 	},
 	84: {
 		FormatExtensionKey:     "mp4",
@@ -141,6 +159,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          84,
 	},
 	85: {
 		FormatExtensionKey:     "mp4",
@@ -148,6 +167,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          85,
 	},
 	100: {
 		FormatExtensionKey:     "webm",
@@ -155,6 +175,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          100,
 	},
 	101: {
 		FormatExtensionKey:     "webm",
@@ -162,6 +183,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          101,
 	},
 	102: {
 		FormatExtensionKey:     "webm",
@@ -169,6 +191,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP8",
 		FormatProfileKey:       "3d",
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          102,
 	},
 	// DASH (video only)
 	133: {
@@ -177,6 +200,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          133,
 	},
 	134: {
 		FormatExtensionKey:     "mp4",
@@ -184,6 +208,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          134,
 	},
 	135: {
 		FormatExtensionKey:     "mp4",
@@ -191,6 +216,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          135,
 	},
 	136: {
 		FormatExtensionKey:     "mp4",
@@ -198,6 +224,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          136,
 	},
 	137: {
 		FormatExtensionKey:     "mp4",
@@ -205,6 +232,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          137,
 	},
 	138: {
 		FormatExtensionKey:     "mp4",
@@ -212,6 +240,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          138,
 	},
 	160: {
 		FormatExtensionKey:     "mp4",
@@ -219,6 +248,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          160,
 	},
 	242: {
 		FormatExtensionKey:     "webm",
@@ -226,6 +256,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          242,
 	},
 	243: {
 		FormatExtensionKey:     "webm",
@@ -233,6 +264,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          243,
 	},
 	244: {
 		FormatExtensionKey:     "webm",
@@ -240,6 +272,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          244,
 	},
 	247: {
 		FormatExtensionKey:     "webm",
@@ -247,6 +280,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          247,
 	},
 	248: {
 		FormatExtensionKey:     "webm",
@@ -254,6 +288,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          248,
 	},
 	264: {
 		FormatExtensionKey:     "mp4",
@@ -261,6 +296,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          264,
 	},
 	266: {
 		FormatExtensionKey:     "mp4",
@@ -268,6 +304,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          266,
 	},
 	271: {
 		FormatExtensionKey:     "webm",
@@ -275,6 +312,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          271,
 	},
 	272: {
 		FormatExtensionKey:     "webm",
@@ -282,6 +320,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          272,
 	},
 	278: {
 		FormatExtensionKey:     "webm",
@@ -289,6 +328,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          278,
 	},
 	298: {
 		FormatExtensionKey:     "mp4",
@@ -296,6 +336,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          298,
 	},
 	299: {
 		FormatExtensionKey:     "mp4",
@@ -303,6 +344,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "high",
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          299,
 	},
 	302: {
 		FormatExtensionKey:     "webm",
@@ -310,6 +352,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          302,
 	},
 	303: {
 		FormatExtensionKey:     "webm",
@@ -317,6 +360,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "VP9",
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: nil,
+		FormatItagKey:          303,
 	},
 	// DASH (audio only)
 	139: {
@@ -325,6 +369,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          139,
 	},
 	140: {
 		FormatExtensionKey:     "mp4",
@@ -332,6 +377,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          140,
 	},
 	141: {
 		FormatExtensionKey:     "mp4",
@@ -339,6 +385,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          141,
 	},
 	171: {
 		FormatExtensionKey:     "webm",
@@ -346,6 +393,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          171,
 	},
 	172: {
 		FormatExtensionKey:     "webm",
@@ -353,6 +401,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "vorbis",
+		FormatItagKey:          172,
 	},
 	249: {
 		FormatExtensionKey:     "webm",
@@ -360,6 +409,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "opus",
+		FormatItagKey:          249,
 	},
 	250: {
 		FormatExtensionKey:     "webm",
@@ -367,6 +417,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "opus",
+		FormatItagKey:          250,
 	},
 	251: {
 		FormatExtensionKey:     "webm",
@@ -374,6 +425,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "opus",
+		FormatItagKey:          251,
 	},
 	// Live streaming
 	92: {
@@ -382,6 +434,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          92,
 	},
 	93: {
 		FormatExtensionKey:     "ts",
@@ -389,6 +442,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          93,
 	},
 	94: {
 		FormatExtensionKey:     "ts",
@@ -396,6 +450,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          94,
 	},
 	95: {
 		FormatExtensionKey:     "ts",
@@ -403,6 +458,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          95,
 	},
 	96: {
 		FormatExtensionKey:     "ts",
@@ -410,6 +466,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "main",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          96,
 	},
 	120: {
 		FormatExtensionKey:     "flv",
@@ -417,6 +474,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "Main@L3.1",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          120,
 	},
 	127: {
 		FormatExtensionKey:     "ts",
@@ -424,6 +482,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          127,
 	},
 	128: {
 		FormatExtensionKey:     "ts",
@@ -431,6 +490,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: nil,
 		FormatProfileKey:       nil,
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          128,
 	},
 	132: {
 		FormatExtensionKey:     "ts",
@@ -438,6 +498,7 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "baseline",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          132,
 	},
 	151: {
 		FormatExtensionKey:     "ts",
@@ -445,5 +506,6 @@ var FORMATS = map[int]Format{
 		FormatVideoEncodingKey: "H.264",
 		FormatProfileKey:       "baseline",
 		FormatAudioEncodingKey: "aac",
+		FormatItagKey:          151,
 	},
 }
