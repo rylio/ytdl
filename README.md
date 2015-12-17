@@ -12,10 +12,10 @@ import (
    "os"
 )
 
-info, err := ytdl.GetInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
-file, _ = os.Create(info.Title + ".mp4")
+vid, err := ytdl.GetVideoInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
+file, _ = os.Create(vid.Title + ".mp4")
 defer file.Close()
-info.Download(file)
+vid.Download(file)
 
 ```
 
