@@ -21,8 +21,8 @@ const youtubeBaseURL = "https://www.youtube.com/watch"
 const youtubeEmbededBaseURL = "https://www.youtube.com/embed/"
 const youtubeDateFormat = "2006-01-02"
 
-// Info contains the info a youtube video
-type Info struct {
+// VideoInfo contains the info a youtube video
+type VideoInfo struct {
 	// The video ID
 	ID string `json:"id"`
 	// The video title
@@ -44,33 +44,33 @@ type Info struct {
 	htmlPlayerFile string
 }
 
-// GetInfo fetches info from a url string, url object, or a url string
-func GetInfo(value interface{}) (*Info, error) {
+// GetVideoInfo fetches info from a url string, url object, or a url string
+func GetVideoInfo(value interface{}) (*VideoInfo, error) {
 	switch value.(type) {
 	case *url.URL:
-		return GetInfoFromURL(value.(*url.URL))
+		return GetVideoInfoFromURL(value.(*url.URL))
 	case string:
 		u, err := url.ParseRequestURI(value.(string))
 		if err != nil {
-			return GetInfoFromID(value.(string))
+			return GetVideoInfoFromID(value.(string))
 		}
-		return GetInfoFromURL(u)
+		return GetVideoInfoFromURL(u)
 	default:
 		return nil, fmt.Errorf("Identifier type must be a string, *url.URL, or []byte")
 	}
 }
 
-// GetInfoFromURL fetches video info from a youtube url
-func GetInfoFromURL(u *url.URL) (*Info, error) {
+// GetVideoInfoFromURL fetches video info from a youtube url
+func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
 	videoID := u.Query().Get("v")
 	if len(videoID) == 0 {
 		return nil, fmt.Errorf("Invalid youtube url, no video id")
 	}
-	return GetInfoFromID(videoID)
+	return GetVideoInfoFromID(videoID)
 }
 
-// GetInfoFromID fetches video info from a youtube video id
-func GetInfoFromID(id string) (*Info, error) {
+// GetVideoInfoFromID fetches video info from a youtube video id
+func GetVideoInfoFromID(id string) (*VideoInfo, error) {
 	u, _ := url.ParseRequestURI(youtubeBaseURL)
 	values := u.Query()
 	values.Set("v", id)
@@ -88,24 +88,24 @@ func GetInfoFromID(id string) (*Info, error) {
 	if err != nil {
 		return nil, err
 	}
-	return getInfoFromHTML(id, body)
+	return getVideoInfoFromHTML(id, body)
 }
 
 // GetDownloadURL gets the download url for a format
-func (info *Info) GetDownloadURL(format Format) (*url.URL, error) {
+func (info *VideoInfo) GetDownloadURL(format Format) (*url.URL, error) {
 	return getDownloadURL(format, info.htmlPlayerFile)
 }
 
 // GetThumbnailURL returns a url for the thumbnail image
 // with the given quality
-func (info *Info) GetThumbnailURL(quality ThumbnailQuality) *url.URL {
+func (info *VideoInfo) GetThumbnailURL(quality ThumbnailQuality) *url.URL {
 	u, _ := url.Parse(fmt.Sprintf("http://img.youtube.com/vi/%s/%s.jpg",
 		info.ID, quality))
 	return u
 }
 
 // Download is a convenience method to download a format to an io.Writer
-func (info *Info) Download(format Format, dest io.Writer) error {
+func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 	u, err := info.GetDownloadURL(format)
 	if err != nil {
 		return err
@@ -122,13 +122,13 @@ func (info *Info) Download(format Format, dest io.Writer) error {
 	return err
 }
 
-func getInfoFromHTML(id string, html []byte) (*Info, error) {
+func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(html))
 	if err != nil {
 		return nil, err
 	}
 
-	info := &Info{}
+	info := &VideoInfo{}
 
 	// extract description and title
 	info.Description = strings.TrimSpace(doc.Find("#eow-description").Text())

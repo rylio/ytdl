@@ -144,7 +144,7 @@ func handler(identifier string, options options) {
 	log.Info("Fetching video info...")
 	//fmt.Print("\u001b[0G")
 	//fmt.Print("\u001b[2K")
-	info, err := ytdl.GetInfo(identifier)
+	info, err := ytdl.GetVideoInfo(identifier)
 	if err != nil {
 		err = fmt.Errorf("Unable to fetch video info: %s", err.Error())
 		return
