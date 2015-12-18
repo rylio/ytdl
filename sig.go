@@ -100,7 +100,7 @@ var actionsObjRegexp = regexp.MustCompile(fmt.Sprintf(
 
 var actionsFuncRegexp = regexp.MustCompile(fmt.Sprintf(
 	"function(?: %s)?\\(a\\)\\{"+
-		"a=a\\.split\\(\"\"\\);"+
+		"a=a\\.split\\(\"\"\\);\\s*"+
 		"((?:(?:a=)?%s\\.%s\\(a,\\d+\\);)+)"+
 		"return a\\.join\\(\"\"\\)"+
 		"\\}", jsvarStr, jsvarStr, jsvarStr))
@@ -122,7 +122,7 @@ func getSigTokens(htmlPlayerFile string) ([]string, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Error fetching sig tokens, status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("Error fetching signature tokens, status code %d", resp.StatusCode)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
@@ -134,7 +134,7 @@ func getSigTokens(htmlPlayerFile string) ([]string, error) {
 	funcResult := actionsFuncRegexp.FindStringSubmatch(bodyString)
 
 	if len(objResult) < 3 || len(funcResult) < 2 {
-		return nil, fmt.Errorf("Error parsing sig tokens")
+		return nil, fmt.Errorf("Error parsing signature tokens")
 	}
 	obj := strings.Replace(objResult[1], "$", "\\$", -1)
 	objBody := strings.Replace(objResult[2], "$", "\\$", -1)
