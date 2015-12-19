@@ -170,7 +170,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		re = regexp.MustCompile("yt.setConfig('PLAYER_CONFIG', (.*?)</script>")
+		re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\)</script>")
 		matches := re.FindSubmatch(html)
 		if len(matches) == 0 {
 			return nil, fmt.Errorf("Error extracting json")
