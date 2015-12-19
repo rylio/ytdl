@@ -36,7 +36,7 @@ func main() {
 	app.ArgsUsage = "[youtube url or video id]"
 	app.Usage = "Download youtube videos"
 	app.HideHelp = true
-	app.Version = "0.3.0"
+	app.Version = "0.3.1"
 
 	app.Flags = []cli.Flag{
 		cli.HelpFlag,
