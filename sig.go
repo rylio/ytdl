@@ -12,22 +12,22 @@ import (
 
 func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	var sig string
-	if s, ok := format["s"]; ok && len(s.(string)) > 0 {
+	if s, ok := format.meta["s"]; ok && len(s.(string)) > 0 {
 		tokens, err := getSigTokens(htmlPlayerFile)
 		if err != nil {
 			return nil, err
 		}
 		sig = decipherTokens(tokens, s.(string))
 	} else {
-		if s, ok := format["sig"]; ok {
+		if s, ok := format.meta["sig"]; ok {
 			sig = s.(string)
 		}
 	}
 	var urlString string
-	if s, ok := format["url"]; ok {
+	if s, ok := format.meta["url"]; ok {
 		urlString = s.(string)
-	} else if s, ok := format["stream"]; ok {
-		if c, ok := format["conn"]; ok {
+	} else if s, ok := format.meta["stream"]; ok {
+		if c, ok := format.meta["conn"]; ok {
 			urlString = c.(string)
 			if urlString[len(urlString)-1] != '/' {
 				urlString += "/"

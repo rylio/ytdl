@@ -19,6 +19,8 @@ import (
 
 const youtubeBaseURL = "https://www.youtube.com/watch"
 const youtubeEmbededBaseURL = "https://www.youtube.com/embed/"
+const youtubeVideoEURL = "https://youtube.googleapis.com/v/"
+const youtubeVideoInfoURL = "https://www.youtube.com/get_video_info"
 const youtubeDateFormat = "2006-01-02"
 
 // VideoInfo contains the info a youtube video
@@ -149,14 +151,14 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	// match json in javascript
 	re := regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
 	matches := re.FindSubmatch(html)
-
 	var jsonConfig map[string]interface{}
-	if len(matches) > 0 {
+	if len(matches) > 1 {
 		err = json.Unmarshal(matches[1], &jsonConfig)
 		if err != nil {
 			return nil, err
 		}
 	} else {
+		log.Debug("Unable to extract json from default url, trying embedded url")
 		var resp *http.Response
 		resp, err = http.Get(youtubeEmbededBaseURL + id)
 		if err != nil {
@@ -170,11 +172,47 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\)</script>")
+		//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
+		re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\);</script>")
+
 		matches := re.FindSubmatch(html)
-		if len(matches) == 0 {
-			return nil, fmt.Errorf("Error extracting json")
+		if len(matches) < 2 {
+			return nil, fmt.Errorf("Error extracting sts from embedded url response")
 		}
+		dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
+		err = dec.Decode(&jsonConfig)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to extract json from embedded url: %s", err.Error())
+		}
+		query := url.Values{
+			"sts":      []string{strconv.Itoa(int(jsonConfig["sts"].(float64)))},
+			"video_id": []string{id},
+			"eurl":     []string{youtubeVideoEURL + id},
+		}
+
+		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
+		if err != nil {
+			return nil, fmt.Errorf("Error fetching video info: %s", err.Error)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			return nil, fmt.Errorf("Video info response invalid status code")
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to read video info response body: %s", err.Error())
+		}
+		query, err = url.ParseQuery(string(body))
+		if err != nil {
+			return nil, fmt.Errorf("Unable to parse video info data: %s", err.Error())
+		}
+		args := make(map[string]interface{})
+		for k, v := range query {
+			if len(v) > 0 {
+				args[k] = v[0]
+			}
+		}
+		jsonConfig["args"] = args
 	}
 
 	inf := jsonConfig["args"].(map[string]interface{})
@@ -184,17 +222,17 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
 	} else {
-		log.Warn("Unable to extract author")
+		log.Debug("Unable to extract author")
 	}
 
 	if length, ok := inf["length_seconds"].(string); ok {
 		if duration, err := strconv.ParseInt(length, 10, 64); err == nil {
 			info.Duration = time.Second * time.Duration(duration)
 		} else {
-			log.Warn("Unable to parse duration string: ", length)
+			log.Debug("Unable to parse duration string: ", length)
 		}
 	} else {
-		log.Warn("Unable to extract duration")
+		log.Debug("Unable to extract duration")
 	}
 	/*
 		// For the future maybe
@@ -251,26 +289,24 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	for _, v := range formatStrings {
 		query, err := url.ParseQuery(v)
 		if err == nil {
-			data := make(Format)
-			if strings.HasPrefix(query.Get("conn"), "rtmp") {
-				data["rtmp"] = true
-			}
-			for k, v := range query {
-				if len(v) == 1 {
-					data[FormatKey(k)] = v[0]
-				} else {
-					data[FormatKey(k)] = v
-				}
-			}
 			itag, _ := strconv.Atoi(query.Get("itag"))
-			if meta, ok := FORMATS[itag]; ok {
-				for k, v := range meta {
-					data[FormatKey(k)] = v
+			if format, ok := newFormat(itag); ok {
+				if strings.HasPrefix(query.Get("conn"), "rtmp") {
+					format.meta["rtmp"] = true
 				}
-				formats = append(formats, data)
+				for k, v := range query {
+					if len(v) == 1 {
+						format.meta[k] = v[0]
+					} else {
+						format.meta[k] = v
+					}
+				}
+				formats = append(formats, format)
 			} else {
 				log.Debug("No metadata found for itag: ", itag, ", skipping...")
 			}
+		} else {
+			log.Debug("Unable to format string", err.Error())
 		}
 	}
 	info.Formats = formats
