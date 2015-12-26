@@ -203,9 +203,9 @@ func handler(identifier string, options options) {
 		var fileName string
 		fileName, err = createFileName(options.outputFile, outputFileName{
 			Title:         info.Title,
-			Ext:           format[ytdl.FormatExtensionKey].(string),
+			Ext:           format.Extension,
 			DatePublished: info.DatePublished.Format("2006-01-02"),
-			Resolution:    format[ytdl.FormatResolutionKey].(string),
+			Resolution:    format.Resolution,
 			Author:        info.Author,
 			Duration:      info.Duration.String(),
 		})
@@ -247,7 +247,6 @@ func handler(identifier string, options options) {
 		return
 	}
 	defer resp.Body.Close()
-
 	// if we aren't in silent mode or the no progress flag wasn't set,
 	// initialize progress bar
 	if !silent && !options.noProgress {
