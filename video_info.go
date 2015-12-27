@@ -42,7 +42,6 @@ type VideoInfo struct {
 	// Duration of the video
 	Duration time.Duration
 
-	//TODO: Add author
 	htmlPlayerFile string
 }
 
@@ -234,28 +233,28 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	} else {
 		log.Debug("Unable to extract duration")
 	}
-	/*
-		// For the future maybe
-		parseKey := func(key string) []string {
-			val, ok := inf[key].(string)
-			if !ok {
-				return nil
-			}
-			vals := []string{}
-			split := strings.Split(val, ",")
-			for _, v := range split {
-				if v != "" {
-					vals = append(vals, v)
-				}
-			}
-			return vals
+
+	// For the future maybe
+	parseKey := func(key string) []string {
+		val, ok := inf[key].(string)
+		if !ok {
+			return nil
 		}
-	*/
+		vals := []string{}
+		split := strings.Split(val, ",")
+		for _, v := range split {
+			if v != "" {
+				vals = append(vals, v)
+			}
+		}
+		return vals
+	}
+	info.Keywords = parseKey("keywords")
+
 	/*
 		fmtList := parseKey("fmt_list")
 		fexp := parseKey("fexp")
 		watermark := parseKey("watermark")
-		keywords := parseKey("keywords")
 
 		if len(fmtList) != 0 {
 			vals := []string{}
@@ -276,7 +275,6 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			}
 		}
 	*/
-
 	var formatStrings []string
 	if fmtStreamMap, ok := inf["url_encoded_fmt_stream_map"].(string); ok {
 		formatStrings = append(formatStrings, strings.Split(fmtStreamMap, ",")...)
