@@ -3,6 +3,7 @@ package ytdl
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -250,6 +251,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		return vals
 	}
 	info.Keywords = parseKey("keywords")
+	info.htmlPlayerFile = jsonConfig["assets"].(map[string]interface{})["js"].(string)
 
 	/*
 		fmtList := parseKey("fmt_list")
@@ -307,7 +309,80 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			log.Debug("Unable to format string", err.Error())
 		}
 	}
+
+	if dashManifestURL, ok := inf["dashmpd"].(string); ok {
+		tokens, err := getSigTokens(info.htmlPlayerFile)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to extract signature tokens: %s", err.Error())
+		}
+		regex := regexp.MustCompile("\\/s\\/([a-fA-F0-9\\.]+)")
+		regexSub := regexp.MustCompile("([a-fA-F0-9\\.]+)")
+		dashManifestURL = regex.ReplaceAllStringFunc(dashManifestURL, func(str string) string {
+			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
+		})
+		dashFormats, err := getDashManifest(dashManifestURL)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to extract dash manifest: %s", err.Error())
+		}
+
+		for _, dashFormat := range dashFormats {
+			added := false
+			for j, format := range formats {
+				if dashFormat.Itag == format.Itag {
+					formats[j] = dashFormat
+					added = true
+					break
+				}
+			}
+			if !added {
+				formats = append(formats, dashFormat)
+			}
+		}
+	}
 	info.Formats = formats
-	info.htmlPlayerFile = jsonConfig["assets"].(map[string]interface{})["js"].(string)
 	return info, nil
+}
+
+type representation struct {
+	Itag   int    `xml:"id,attr"`
+	Height int    `xml:"height,attr"`
+	URL    string `xml:"BaseURL"`
+}
+
+func getDashManifest(urlString string) (formats []Format, err error) {
+
+	resp, err := http.Get(urlString)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Invalid status code %d", resp.StatusCode)
+	}
+	dec := xml.NewDecoder(resp.Body)
+	var token xml.Token
+	for ; err == nil; token, err = dec.Token() {
+		if el, ok := token.(xml.StartElement); ok && el.Name.Local == "Representation" {
+			var rep representation
+			err = dec.DecodeElement(&rep, &el)
+			if err != nil {
+				break
+			}
+			if format, ok := newFormat(rep.Itag); ok {
+				format.meta["url"] = rep.URL
+				if rep.Height != 0 {
+					format.Resolution = strconv.Itoa(rep.Height) + "p"
+				} else {
+					format.Resolution = ""
+				}
+				formats = append(formats, format)
+			} else {
+				log.Debug("No metadata found for itag: ", rep.Itag, ", skipping...")
+			}
+		}
+	}
+	if err != io.EOF {
+		return nil, err
+	}
+	return formats, nil
 }
