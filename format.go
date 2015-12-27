@@ -14,10 +14,10 @@ const (
 
 type Format struct {
 	Itag          int    `json:"itag"`
-	Extension     string `json: "extension"`
-	Resolution    string `json: "resolution"`
-	VideoEncoding string `json: "videoEncoding"`
-	AudioEncoding string `json: "audioEncoding"`
+	Extension     string `json:"extension"`
+	Resolution    string `json:"resolution"`
+	VideoEncoding string `json:"videoEncoding"`
+	AudioEncoding string `json:"audioEncoding"`
 	meta          map[string]interface{}
 }
 
