@@ -12,6 +12,7 @@ const (
 	FormatItagKey          FormatKey = "itag"
 )
 
+// Format is a youtube is a static youtube video format
 type Format struct {
 	Itag          int    `json:"itag"`
 	Extension     string `json:"extension"`
@@ -29,6 +30,7 @@ func newFormat(itag int) (Format, bool) {
 	return Format{}, false
 }
 
+// ValueForKey gets the format value for a format key, used for filtering
 func (f Format) ValueForKey(key FormatKey) interface{} {
 	switch key {
 	case FormatItagKey:
