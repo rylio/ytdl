@@ -69,12 +69,6 @@ func main() {
 		cli.StringSliceFlag{
 			Name:  "filter, f",
 			Usage: "Filter available formats, syntax: [format_key]:val1,val2",
-			Value: &cli.StringSlice{
-				fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
-				fmt.Sprintf("%s:1080p,720p,480p,360p,240p,144p", ytdl.FormatResolutionKey),
-				fmt.Sprintf("!%s:nil", ytdl.FormatVideoEncodingKey),
-				fmt.Sprintf("!%s:nil", ytdl.FormatAudioEncodingKey),
-			},
 		},
 		cli.StringFlag{
 			Name:  "range, r",
@@ -106,6 +100,14 @@ func main() {
 				downloadURL: c.Bool("download-url"),
 				byteRange:   c.String("range"),
 				json:        c.Bool("json"),
+			}
+			if len(options.filters) == 0 {
+				options.filters = cli.StringSlice{
+					fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
+					fmt.Sprintf("%s:1080p,720p,480p,360p,240p,144p", ytdl.FormatResolutionKey),
+					fmt.Sprintf("!%s:nil", ytdl.FormatVideoEncodingKey),
+					fmt.Sprintf("!%s:nil", ytdl.FormatAudioEncodingKey),
+				}
 			}
 			handler(identifier, options)
 		}

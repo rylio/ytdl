@@ -27,10 +27,10 @@ func FilterFormats(formats []Format, key FormatKey, values []string) []Format {
 
 func convertToString(val interface{}) string {
 	switch val.(type) {
-	case int, int8, int16, int32, int64:
-		return strconv.FormatInt(val.(int64), 10)
-	case uint, uint8, uint16, uint32, uint64:
-		return strconv.FormatUint(val.(uint64), 10)
+	case int:
+		return strconv.FormatInt(int64(val.(int)), 10)
+	case uint:
+		return strconv.FormatUint(uint64(val.(uint)), 10)
 	case string:
 		return val.(string)
 	default:
