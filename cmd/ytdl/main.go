@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
 	"encoding/json"
 
@@ -131,7 +132,8 @@ func handler(identifier string, options options) {
 	log.SetOutput(logOut)
 
 	// ouput only errors or not
-	silent := options.outputFile == "" || options.silent || options.infoOnly || options.downloadURL || options.json
+	silent := options.outputFile == "" ||
+		options.silent || options.infoOnly || options.downloadURL || options.json
 	if silent {
 		log.SetLevel(log.FatalLevel)
 	} else if options.debug {
@@ -235,8 +237,15 @@ func handler(identifier string, options options) {
 	var req *http.Request
 	req, err = http.NewRequest("GET", downloadURL.String(), nil)
 	// if byte range flag is set, use http range header option
-	if options.byteRange != "" {
-		req.Header.Set("Range", "bytes="+options.byteRange)
+	if options.byteRange != "" || options.append {
+		if options.byteRange == "" && out != os.Stdout {
+			if stat, err := out.(*os.File).Stat(); err != nil {
+				options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
+			}
+		}
+		if options.byteRange != "" {
+			req.Header.Set("Range", "bytes="+options.byteRange)
+		}
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode < 200 || resp.StatusCode >= 300 {
