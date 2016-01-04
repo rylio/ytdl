@@ -1,7 +1,5 @@
 package ytdl
 
-import "strconv"
-
 // FilterFormats filters out all formats whose key doesn't contain
 // any of values. Formats are ordered by values
 func FilterFormats(formats []Format, key FormatKey, values []string) []Format {
@@ -13,7 +11,7 @@ func FilterFormats(formats []Format, key FormatKey, values []string) []Format {
 	for _, value := range values {
 		for _, format := range formats {
 			v := format.ValueForKey(key)
-			val := convertToString(v)
+			val := interfaceToString(v)
 			if val == "" {
 				val = "nil"
 			}
@@ -23,20 +21,6 @@ func FilterFormats(formats []Format, key FormatKey, values []string) []Format {
 		}
 	}
 	return filtered
-}
-
-func convertToString(val interface{}) string {
-	switch val.(type) {
-	case int:
-		return strconv.FormatInt(int64(val.(int)), 10)
-	case uint:
-		return strconv.FormatUint(uint64(val.(uint)), 10)
-	case string:
-		return val.(string)
-	default:
-		return ""
-
-	}
 }
 
 // FilterFormatsExclude excludes all formats whose passed key
@@ -50,7 +34,7 @@ func FilterFormatsExclude(formats []Format, key FormatKey, values []string) []Fo
 		exclude := false
 		for _, value := range values {
 			v := format.ValueForKey(key)
-			val := convertToString(v)
+			val := interfaceToString(v)
 			if val == "" {
 				val = "nil"
 			}

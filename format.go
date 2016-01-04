@@ -48,6 +48,9 @@ func (f Format) ValueForKey(key FormatKey) interface{} {
 	case FormatKeyAudioBitrate:
 		return f.AudioBitrate
 	default:
+		if f.meta != nil {
+			return f.meta[string(key)]
+		}
 		return nil
 	}
 }
