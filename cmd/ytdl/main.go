@@ -206,12 +206,12 @@ func handler(identifier string, options options) {
 	if out == nil {
 		var fileName string
 		fileName, err = createFileName(options.outputFile, outputFileName{
-			Title:         info.Title,
-			Ext:           format.Extension,
-			DatePublished: info.DatePublished.Format("2006-01-02"),
-			Resolution:    format.Resolution,
-			Author:        info.Author,
-			Duration:      info.Duration.String(),
+			Title:         sanitizeFileNamePart(info.Title),
+			Ext:           sanitizeFileNamePart(format.Extension),
+			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
+			Resolution:    sanitizeFileNamePart(format.Resolution),
+			Author:        sanitizeFileNamePart(info.Author),
+			Duration:      sanitizeFileNamePart(info.Duration.String()),
 		})
 		if err != nil {
 			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())

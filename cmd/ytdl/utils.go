@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"regexp"
 	"strings"
 	"text/template"
 )
@@ -48,4 +49,12 @@ func createFileName(template string, values outputFileName) (string, error) {
 		return "", err
 	}
 	return string(buf.String()), nil
+}
+
+var illegalFileNameCharacters = regexp.MustCompile(`[^[a-zA-Z0-9]-_]`)
+
+func sanitizeFileNamePart(part string) string {
+	part = strings.Replace(part, "/", "-", -1)
+	part = illegalFileNameCharacters.ReplaceAllString(part, "")
+	return part
 }
