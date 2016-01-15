@@ -105,8 +105,8 @@ func main() {
 				options.filters = cli.StringSlice{
 					fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
 					fmt.Sprintf("%s:1080p,720p,480p,360p,240p,144p", ytdl.FormatResolutionKey),
-					fmt.Sprintf("!%s:nil", ytdl.FormatVideoEncodingKey),
-					fmt.Sprintf("!%s:nil", ytdl.FormatAudioEncodingKey),
+					fmt.Sprintf("!%s:", ytdl.FormatVideoEncodingKey),
+					fmt.Sprintf("!%s:", ytdl.FormatAudioEncodingKey),
 				}
 			}
 			handler(identifier, options)
@@ -154,8 +154,6 @@ func handler(identifier string, options options) {
 		return
 	}
 
-	// TODO: Get more info, and change structure
-	// TODO: Allow json output
 	if options.infoOnly {
 		fmt.Println("Title:", info.Title)
 		fmt.Println("Author:", info.Author)
