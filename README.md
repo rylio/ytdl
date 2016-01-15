@@ -39,8 +39,8 @@ To install: ``go get -u github.com/otium/ytdl/...``
    - Default filters
       - ```ext:mp4```
       - ```res:1080p,720p,480p,360p,240p,144p```
-      - ```!videnc:nil```
-      - ```!audenc:nil```
+      - ```!videnc:```
+      - ```!audenc:```
  - ```--output, -o``` - Output to specific path
    - Supports templates, ex: {{.Title}}.{{.Ext}}
    - Defaults to ```{{.Title}}.{{.Ext}}```

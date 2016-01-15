@@ -41,5 +41,21 @@ func TestReverseString(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestInterfaceToString(t *testing.T) {
+
+	values := map[interface{}]string{
+		8:         "8",
+		int64(16): "16",
+		"hello":   "hello",
+		0.01:      "0.01",
+	}
+
+	for k, v := range values {
+		if interfaceToString(k) != v {
+			t.Error("Value:", v, " != ", v)
+		}
+	}
 
 }

@@ -1,6 +1,8 @@
 package ytdl
 
-// FormatKey is a string type containg a key in a video format map
+import "strconv"
+
+// FormatKey is a string type containing a key in a video format map
 type FormatKey string
 
 // Available format Keys
@@ -10,7 +12,7 @@ const (
 	FormatVideoEncodingKey FormatKey = "videnc"
 	FormatAudioEncodingKey FormatKey = "audenc"
 	FormatItagKey          FormatKey = "itag"
-	FormatKeyAudioBitrate  FormatKey = "audbr"
+	FormatAudioBitrateKey  FormatKey = "audbr"
 )
 
 // Format is a youtube is a static youtube video format
@@ -45,13 +47,33 @@ func (f Format) ValueForKey(key FormatKey) interface{} {
 		return f.VideoEncoding
 	case FormatAudioEncodingKey:
 		return f.AudioEncoding
-	case FormatKeyAudioBitrate:
+	case FormatAudioBitrateKey:
 		return f.AudioBitrate
 	default:
 		if f.meta != nil {
 			return f.meta[string(key)]
 		}
 		return nil
+	}
+}
+
+func (f Format) CompareKey(other Format, key FormatKey) int {
+	switch key {
+	case FormatResolutionKey:
+		res := f.ValueForKey(key).(string)
+		res1, res2 := 0, 0
+		if res != "" {
+			res1, _ = strconv.Atoi(res[0 : len(res)-2])
+		}
+		res = other.ValueForKey(key).(string)
+		if res != "" {
+			res2, _ = strconv.Atoi(res[0 : len(res)-2])
+		}
+		return res1 - res2
+	case FormatAudioBitrateKey:
+		return f.ValueForKey(key).(int) - other.ValueForKey(key).(int)
+	default:
+		return 0
 	}
 }
 
