@@ -6,7 +6,7 @@ import "sort"
 // any of values. Formats are ordered by values
 func FilterFormats(formats []Format, key FormatKey, values []string) []Format {
 	if len(values) == 0 {
-		return formats
+		return nil
 	}
 	filtered := []Format{}
 	// filter values first for priority

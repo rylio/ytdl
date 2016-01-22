@@ -53,6 +53,11 @@ func TestFilterFormatsInclude(t *testing.T) {
 			[]string{"0"},
 			[]Format{formats[4]},
 		},
+		FormatFilterTestCase{
+			FormatResolutionKey,
+			[]string{},
+			nil,
+		},
 	}
 	for _, v := range cases {
 		f := FilterFormats(formats, v.Key, v.FilterValues.([]string))
@@ -72,6 +77,11 @@ func TestFilterFormatsExclude(t *testing.T) {
 			FormatResolutionKey,
 			[]string{"480p", "360p", "240p", ""},
 			[]Format{formats[1], formats[3]},
+		},
+		FormatFilterTestCase{
+			FormatResolutionKey,
+			[]string{},
+			formats,
 		},
 	}
 	for _, v := range cases {
