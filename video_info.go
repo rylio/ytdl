@@ -35,7 +35,7 @@ type VideoInfo struct {
 	// The date the video was published
 	DatePublished time.Time `json:"datePublished"`
 	// Formats the video is available in
-	Formats []Format `json:"formats"`
+	Formats FormatList `json:"formats"`
 	// List of keywords associated with the video
 	Keywords []string `json:"keywords"`
 	// Author of the video
@@ -192,7 +192,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
 		if err != nil {
-			return nil, fmt.Errorf("Error fetching video info: %s", err.Error)
+			return nil, fmt.Errorf("Error fetching video info: %s", err.Error())
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
@@ -285,7 +285,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	if adaptiveFormats, ok := inf["adaptive_fmts"].(string); ok {
 		formatStrings = append(formatStrings, strings.Split(adaptiveFormats, ",")...)
 	}
-	var formats []Format
+	var formats FormatList
 	for _, v := range formatStrings {
 		query, err := url.ParseQuery(v)
 		if err == nil {

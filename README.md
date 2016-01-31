@@ -28,19 +28,24 @@ To install: ``go get -u github.com/otium/ytdl/...``
 ### Options
  - ```--help, -h``` - show help
  - ```--filter, -f``` - Filter out formats
-   - Syntax: key:value1,value2,...,valueN
-   - To exclude: !key:value1,...
+   - Syntax: ```-f key:value1,value2,...,valueN```
+      - Shortcuts for best/worst(e.g. ```-f best```)
+         - ```best```/```worst``` - best/worst video and audio
+         - ```best-video```/```worst-video``` - best/worst video
+         - ```best-audio```/```worst-audio``` - best/worst audio
+   - To exclude:  -f !key:value1,...
    - Available keys (See format.go for available values):
       - ```ext``` - extension of video
       - ```res``` - resolution of video
       - ```videnc``` - video encoding
       - ```audenc``` - audio encoding
       - ```prof``` - youtube video profile
+      - ```audbr``` - audio bitrate
    - Default filters
       - ```ext:mp4```
-      - ```res:1080p,720p,480p,360p,240p,144p```
       - ```!videnc:```
       - ```!audenc:```
+      - ```best```
  - ```--output, -o``` - Output to specific path
    - Supports templates, ex: {{.Title}}.{{.Ext}}
    - Defaults to ```{{.Title}}.{{.Ext}}```

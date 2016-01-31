@@ -104,9 +104,9 @@ func main() {
 			if len(options.filters) == 0 {
 				options.filters = cli.StringSlice{
 					fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
-					fmt.Sprintf("%s:1080p,720p,480p,360p,240p,144p", ytdl.FormatResolutionKey),
 					fmt.Sprintf("!%s:", ytdl.FormatVideoEncodingKey),
 					fmt.Sprintf("!%s:", ytdl.FormatAudioEncodingKey),
+					fmt.Sprint("best"),
 				}
 			}
 			handler(identifier, options)
@@ -174,13 +174,9 @@ func handler(identifier string, options options) {
 	formats := info.Formats
 	// parse filter arguments, and filter through formats
 	for _, filter := range options.filters {
-		key, values, exclude, err := parseFilter(filter)
+		filter, err := parseFilter(filter)
 		if err == nil {
-			if exclude {
-				formats = ytdl.FilterFormatsExclude(formats, ytdl.FormatKey(key), values)
-			} else {
-				formats = ytdl.FilterFormats(formats, ytdl.FormatKey(key), values)
-			}
+			formats = filter(formats)
 		}
 	}
 	if len(formats) == 0 {

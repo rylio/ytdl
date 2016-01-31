@@ -29,7 +29,7 @@ func TestDownloadVideo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	format := FilterFormatsExtremes(info.Formats, FormatResolutionKey, false)[0]
+	format := info.Formats.Worst(FormatResolutionKey)[0]
 	err = info.Download(format, ioutil.Discard)
 	if err != nil {
 		t.Error(err)
