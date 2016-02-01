@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"encoding/json"
 
@@ -27,6 +28,7 @@ type options struct {
 	downloadURL bool
 	byteRange   string
 	json        bool
+	startOffset string
 }
 
 func main() {
@@ -82,6 +84,10 @@ func main() {
 			Name:  "json, j",
 			Usage: "Print info json to stdout",
 		},
+		cli.StringFlag{
+			Name:  "start-offset",
+			Usage: "Offset the start of the video by time",
+		},
 	}
 
 	app.Action = func(c *cli.Context) {
@@ -100,6 +106,7 @@ func main() {
 				downloadURL: c.Bool("download-url"),
 				byteRange:   c.String("range"),
 				json:        c.Bool("json"),
+				startOffset: c.String("start-offset"),
 			}
 			if len(options.filters) == 0 {
 				options.filters = cli.StringSlice{
@@ -188,6 +195,13 @@ func handler(identifier string, options options) {
 	if err != nil {
 		err = fmt.Errorf("Unable to get download url: %s", err.Error())
 		return
+	}
+	if options.startOffset != "" {
+		var offset time.Duration
+		offset, err = time.ParseDuration(options.startOffset)
+		query := downloadURL.Query()
+		query.Set("begin", fmt.Sprint(int64(offset/time.Millisecond)))
+		downloadURL.RawQuery = query.Encode()
 	}
 	if options.downloadURL {
 		fmt.Print(downloadURL.String())
