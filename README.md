@@ -59,7 +59,7 @@ To install: ``go get -u github.com/otium/ytdl/...``
  - ```--range, -r``` - specify a range of bytes, placed in http range header, ex: 0-100
  - ```--download-url, -u``` - just print download url to, don't do anything else
  - ```--version, -v``` - print out ytdl cli version
- - ```--start-offset``` - offset the beginning of by a duration of time(e.g. 20s or 1m)
+ - ```--start-offset``` - offset the beginning of the video by a duration of time(e.g. 20s or 1m)
 
 ## License
 ytdl is released under the MIT License, see LICENSE for more details.
