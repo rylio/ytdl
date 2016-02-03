@@ -1,4 +1,3 @@
-
 # ytdl [![Build Status](https://travis-ci.org/otium/ytdl.svg)](https://travis-ci.org/otium/ytdl) [![GoDoc](https://godoc.org/github.com/codegangsta/cli?status.svg)](https://godoc.org/github.com/otium/ytdl)
 ------
 Go library for downloading YouTube videos
@@ -6,7 +5,8 @@ Go library for downloading YouTube videos
 [Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/ytdl "ytdl")
 
 ## Example
-```
+
+```go
 import (
    "github.com/otium/ytdl"
    "os"
@@ -16,7 +16,6 @@ vid, err := ytdl.GetVideoInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
 file, _ = os.Create(vid.Title + ".mp4")
 defer file.Close()
 vid.Download(file)
-
 ```
 
 ## ytdl CLI
