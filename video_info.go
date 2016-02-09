@@ -18,11 +18,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-const youtubeBaseURL = "https://www.youtube.com/watch"
-const youtubeEmbededBaseURL = "https://www.youtube.com/embed/"
-const youtubeVideoEURL = "https://youtube.googleapis.com/v/"
-const youtubeVideoInfoURL = "https://www.youtube.com/get_video_info"
-const youtubeDateFormat = "2006-01-02"
+const (
+	youtubeBaseURL        = "https://www.youtube.com"
+	youtubeVideoURL       = "https://www.youtube.com/watch"
+	youtubeEmbededBaseURL = "https://www.youtube.com/embed/"
+	youtubeVideoEURL      = "https://youtube.googleapis.com/v/"
+	youtubeVideoInfoURL   = "https://www.youtube.com/get_video_info"
+	youtubeDateFormat     = "2006-01-02"
+)
 
 // VideoInfo contains the info a youtube video
 type VideoInfo struct {
@@ -73,7 +76,7 @@ func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
 
 // GetVideoInfoFromID fetches video info from a youtube video id
 func GetVideoInfoFromID(id string) (*VideoInfo, error) {
-	u, _ := url.ParseRequestURI(youtubeBaseURL)
+	u, _ := url.ParseRequestURI(youtubeVideoURL)
 	values := u.Query()
 	values.Set("v", id)
 	u.RawQuery = values.Encode()
