@@ -8,28 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"encoding/json"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/cheggaaa/pb"
 	"github.com/codegangsta/cli"
-	"github.com/mattn/go-isatty"
 	"github.com/otium/ytdl"
 )
-
-type options struct {
-	noProgress  bool
-	outputFile  string
-	infoOnly    bool
-	silent      bool
-	debug       bool
-	append      bool
-	filters     []string
-	downloadURL bool
-	byteRange   string
-	json        bool
-	startOffset string
-}
 
 func main() {
 	app := cli.NewApp()
@@ -41,243 +24,209 @@ func main() {
 	app.HideHelp = true
 	app.Version = "0.5.0"
 
+	opt := options{}
+
 	app.Flags = []cli.Flag{
 		cli.HelpFlag,
 		cli.StringFlag{
-			Name:  "output, o",
-			Usage: "Write output to a file, passing - outputs to stdout",
-			Value: "{{.Title}}.{{.Ext}}",
+			Name:        "output, o",
+			Usage:       "Write output to a file, passing - outputs to stdout",
+			Value:       "{{.Title}}.{{.Ext}}",
+			Destination: &opt.Output,
 		},
 		cli.BoolFlag{
-			Name:  "info, i",
-			Usage: "Only output video info",
+			Name:        "info, i",
+			Usage:       "Only output video info",
+			Destination: &opt.Info,
 		},
 		cli.BoolFlag{
-			Name:  "no-progress",
-			Usage: "Disable the progress bar",
+			Name:        "no-progress",
+			Usage:       "Disable the progress bar",
+			Destination: &opt.NoProgress,
 		},
 		cli.BoolFlag{
-			Name:  "silent, s",
-			Usage: "Only output errors, also disables progress bar",
+			Name:        "silent, s",
+			Usage:       "Only output errors, also disables progress bar",
+			Destination: &opt.SilentMode,
 		},
 		cli.BoolFlag{
-			Name:  "debug, d",
-			Usage: "Output debug log",
+			Name:        "debug, d",
+			Usage:       "Output debug log",
+			Destination: &opt.DebugMode,
 		},
 		cli.BoolFlag{
-			Name:  "append, a",
-			Usage: "Append to output file instead of overwriting",
+			Name:        "append, a",
+			Usage:       "Append to output file instead of overwriting",
+			Destination: &opt.Append,
 		},
 		cli.StringSliceFlag{
 			Name:  "filter, f",
 			Usage: "Filter available formats, syntax: [format_key]:val1,val2",
 		},
 		cli.StringFlag{
-			Name:  "range, r",
-			Usage: "Download a specific range of bytes of the video, [start]-[end]",
+			Name:        "range, r",
+			Usage:       "Download a specific range of bytes of the video, [start]-[end]",
+			Destination: &opt.Range,
 		},
 		cli.BoolFlag{
-			Name:  "download-url, u",
-			Usage: "Prints download url to stdout",
+			Name:        "download-url, u",
+			Usage:       "Prints download url to stdout",
+			Destination: &opt.DownloadURL,
 		},
 		cli.BoolFlag{
-			Name:  "json, j",
-			Usage: "Print info json to stdout",
+			Name:        "json, j",
+			Usage:       "Print info json to stdout",
+			Destination: &opt.JSON,
 		},
 		cli.StringFlag{
-			Name:  "start-offset",
-			Usage: "Offset the start of the video by time",
+			Name:        "start-offset",
+			Usage:       "Offset the start of the video by time",
+			Destination: &opt.Offset,
 		},
 	}
 
 	app.Action = func(c *cli.Context) {
-		identifier := c.Args().First()
-		if identifier == "" || c.Bool("help") {
+		identifiers := c.Args()
+		if len(identifiers) == 0 || c.Bool("help") {
 			cli.ShowAppHelp(c)
 		} else {
-			options := options{
-				noProgress:  c.Bool("no-progress"),
-				outputFile:  c.String("output"),
-				infoOnly:    c.Bool("info"),
-				silent:      c.Bool("silent"),
-				debug:       c.Bool("debug"),
-				append:      c.Bool("append"),
-				filters:     c.StringSlice("filter"),
-				downloadURL: c.Bool("download-url"),
-				byteRange:   c.String("range"),
-				json:        c.Bool("json"),
-				startOffset: c.String("start-offset"),
-			}
-			if len(options.filters) == 0 {
-				options.filters = cli.StringSlice{
-					fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
-					fmt.Sprintf("!%s:", ytdl.FormatVideoEncodingKey),
-					fmt.Sprintf("!%s:", ytdl.FormatAudioEncodingKey),
-					fmt.Sprint("best"),
-				}
-			}
-			handler(identifier, options)
+			run(identifiers, opt)
 		}
 	}
 	app.Run(os.Args)
 }
 
-func handler(identifier string, options options) {
-	var err error
-	defer func() {
-		if err != nil {
-			log.SetOutput(os.Stderr)
-			log.Fatal(err.Error())
-		}
-	}()
+func run(identifiers []string, opt options) {
 
-	var out io.Writer
-	var logOut io.Writer = os.Stdout
-	// if downloading to stdout, set log output to stderr, not sure if this is correct
-	if options.outputFile == "-" {
-		out = os.Stdout
-		logOut = os.Stderr
+	var logWriter io.Writer = os.Stdout
+	if opt.Output == "-" {
+		logWriter = os.Stderr
 	}
-	log.SetOutput(logOut)
+	log.SetOutput(logWriter)
 
-	// ouput only errors or not
-	silent := options.outputFile == "" ||
-		options.silent || options.infoOnly || options.downloadURL || options.json
-	if silent {
-		log.SetLevel(log.FatalLevel)
-	} else if options.debug {
+	silentMode := opt.SilentMode || opt.Info || opt.JSON || opt.DownloadURL
+
+	if opt.DebugMode {
 		log.SetLevel(log.DebugLevel)
+	} else if silentMode {
+		log.SetLevel(log.FatalLevel)
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
 
-	// TODO: Show activity indicator
-	log.Info("Fetching video info...")
-	//fmt.Print("\u001b[0G")
-	//fmt.Print("\u001b[2K")
-	info, err := ytdl.GetVideoInfo(identifier)
-	if err != nil {
-		err = fmt.Errorf("Unable to fetch video info: %s", err.Error())
-		return
-	}
-
-	if options.infoOnly {
-		fmt.Println("Title:", info.Title)
-		fmt.Println("Author:", info.Author)
-		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
-		fmt.Println("Duration:", info.Duration)
-		return
-	} else if options.json {
-		var data []byte
-		data, err = json.MarshalIndent(info, "", "\t")
+	for _, identifier := range identifiers {
+		log.Info("Getting video info for ", identifier, "...")
+		info, err := ytdl.GetVideoInfo(identifier)
 		if err != nil {
-			err = fmt.Errorf("Unable to marshal json: %s", err.Error())
-			return
+			log.Error("Unable to get video info: ", err.Error())
+			continue
 		}
-		fmt.Println(string(data))
-		return
-	}
+		if opt.Info || opt.JSON {
+			printInfo(info, opt.JSON)
+			continue
+		}
+		formats := info.Formats
 
-	formats := info.Formats
-	// parse filter arguments, and filter through formats
-	for _, filter := range options.filters {
-		filter, err := parseFilter(filter)
-		if err == nil {
-			formats = filter(formats)
-		}
-	}
-	if len(formats) == 0 {
-		err = fmt.Errorf("No formats available that match criteria")
-		return
-	}
-	format := formats[0]
-	downloadURL, err := info.GetDownloadURL(format)
-	if err != nil {
-		err = fmt.Errorf("Unable to get download url: %s", err.Error())
-		return
-	}
-	if options.startOffset != "" {
-		var offset time.Duration
-		offset, err = time.ParseDuration(options.startOffset)
-		query := downloadURL.Query()
-		query.Set("begin", fmt.Sprint(int64(offset/time.Millisecond)))
-		downloadURL.RawQuery = query.Encode()
-	}
-	if options.downloadURL {
-		fmt.Print(downloadURL.String())
-		// print new line character if outputing to terminal
-		if isatty.IsTerminal(os.Stdout.Fd()) {
-			fmt.Println()
-		}
-		return
-	}
-	if out == nil {
-		var fileName string
-		fileName, err = createFileName(options.outputFile, outputFileName{
-			Title:         sanitizeFileNamePart(info.Title),
-			Ext:           sanitizeFileNamePart(format.Extension),
-			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
-			Resolution:    sanitizeFileNamePart(format.Resolution),
-			Author:        sanitizeFileNamePart(info.Author),
-			Duration:      sanitizeFileNamePart(info.Duration.String()),
-		})
-		if err != nil {
-			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
-			return
-		}
-		// Create file truncate if append flag is not set
-		flags := os.O_CREATE | os.O_WRONLY
-		if options.append {
-			flags |= os.O_APPEND
-		} else {
-			flags |= os.O_TRUNC
-		}
-		var f *os.File
-		// open as write only
-		f, err = os.OpenFile(fileName, flags, 0666)
-		if err != nil {
-			err = fmt.Errorf("Unable to open output file: %s", err.Error())
-			return
-		}
-		defer f.Close()
-		out = f
-	}
-
-	log.Info("Downloading to ", out.(*os.File).Name())
-	var req *http.Request
-	req, err = http.NewRequest("GET", downloadURL.String(), nil)
-	// if byte range flag is set, use http range header option
-	if options.byteRange != "" || options.append {
-		if options.byteRange == "" && out != os.Stdout {
-			if stat, err := out.(*os.File).Stat(); err != nil {
-				options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
+		for _, f := range opt.Filters {
+			filter, err := parseFilter(f)
+			if err == nil {
+				formats = filter(formats)
+			} else {
+				log.Debug("Error parsing format:", err)
 			}
 		}
-		if options.byteRange != "" {
-			req.Header.Set("Range", "bytes="+options.byteRange)
+		if len(formats) == 0 {
+			log.Error("No available formats")
+			continue
+		}
+		selectedFormat := formats[0]
+		downloadURL, err := info.GetDownloadURL(selectedFormat)
+		if err != nil {
+			log.Error("Error getting download url: ", err.Error())
+			continue
+		}
+		if opt.Offset != "" {
+			if offset, err := time.ParseDuration(opt.Offset); err != nil {
+				query := downloadURL.Query()
+				query.Set("begin", fmt.Sprint(int64(offset/time.Millisecond)))
+				downloadURL.RawQuery = query.Encode()
+			} else {
+				log.Debug("Error parsing offset: ", err)
+			}
+		}
+		if opt.DownloadURL {
+			fmt.Println(downloadURL.String())
+			//	if isatty.IsTerminal(os.Stdout.Fd()) {
+			//		fmt.Println()
+			//	}
+			continue
+		}
+		var outputWriter io.Writer
+		if opt.Output == "-" {
+			outputWriter = os.Stdout
+		} else {
+			fileName, err := newOutputFileName(info, selectedFormat).String(opt.Output)
+			if err != nil {
+				log.Error("Error creating output filename: ", err.Error())
+				continue
+			}
+			flags := os.O_CREATE | os.O_WRONLY
+			if opt.Append {
+				flags |= os.O_APPEND
+			} else {
+				flags |= os.O_TRUNC
+			}
+			outputWriter, err = os.OpenFile(fileName, flags, 0666)
+			if err != nil {
+				log.Error("Error opening output file: ", err.Error())
+				continue
+			}
+			defer outputWriter.(*os.File).Close()
+		}
+		req, err := http.NewRequest("GET", downloadURL.String(), nil)
+		if err != nil {
+			log.Error("Error creating request: ", err)
+			continue
+		}
+		if opt.Range == "" && opt.Append {
+			if outputWriter != os.Stdout {
+				stat, err := outputWriter.(*os.File).Stat()
+				if err == nil {
+					opt.Range = strconv.FormatInt(stat.Size(), 10) + "-"
+				}
+			}
+		}
+		if opt.Range != "" {
+			req.Header.Set("Range", "bytes="+opt.Range)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Error("Error starting download: ", err.Error())
+			continue
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			log.Error("Recieved invalid status code: ", resp.StatusCode)
+			continue
+		}
+		var progressBar *pb.ProgressBar
+		if !silentMode && !opt.NoProgress {
+			progressBar = pb.New64(resp.ContentLength).SetUnits(pb.U_BYTES)
+			progressBar.ShowTimeLeft = true
+			progressBar.ShowSpeed = true
+			progressBar.Start()
+			outputWriter = io.MultiWriter(outputWriter, progressBar)
+		}
+		_, err = io.Copy(outputWriter, resp.Body)
+		if progressBar != nil {
+			progressBar.Finish()
+		}
+		if err != nil {
+			log.Error("Error downloading video: ", err)
 		}
 	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil || resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		if err == nil {
-			err = fmt.Errorf("Received status code %d from download url", resp.StatusCode)
-		}
-		err = fmt.Errorf("Unable to start download: %s", err.Error())
-		return
-	}
-	defer resp.Body.Close()
-	// if we aren't in silent mode or the no progress flag wasn't set,
-	// initialize progress bar
-	if !silent && !options.noProgress {
-		progressBar := pb.New64(resp.ContentLength)
-		progressBar.SetUnits(pb.U_BYTES)
-		progressBar.ShowTimeLeft = true
-		progressBar.ShowSpeed = true
-		//	progressBar.RefreshRate = time.Millisecond * 1
-		progressBar.Output = logOut
-		progressBar.Start()
-		defer progressBar.Finish()
-		out = io.MultiWriter(out, progressBar)
-	}
-	_, err = io.Copy(out, resp.Body)
+}
+
+func printInfo(info *ytdl.VideoInfo, json bool) {
+	fmt.Println(info.Title)
 }

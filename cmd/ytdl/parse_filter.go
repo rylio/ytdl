@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"regexp"
-	"strings"
-	"text/template"
-
 	"github.com/otium/ytdl"
+	"strings"
 )
 
 func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, error) {
@@ -59,36 +55,4 @@ func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, er
 		}
 		return f
 	}, nil
-}
-
-type outputFileName struct {
-	Title         string
-	Author        string
-	Ext           string
-	DatePublished string
-	Resolution    string
-	Duration      string
-}
-
-var fileNameTemplate = template.New("OutputFileName")
-
-func createFileName(template string, values outputFileName) (string, error) {
-	t, err := fileNameTemplate.Parse(template)
-	if err != nil {
-		return "", err
-	}
-	buf := &bytes.Buffer{}
-	err = t.Execute(buf, values)
-	if err != nil {
-		return "", err
-	}
-	return string(buf.String()), nil
-}
-
-var illegalFileNameCharacters = regexp.MustCompile(`[^[a-zA-Z0-9]-_]`)
-
-func sanitizeFileNamePart(part string) string {
-	part = strings.Replace(part, "/", "-", -1)
-	part = illegalFileNameCharacters.ReplaceAllString(part, "")
-	return part
 }
