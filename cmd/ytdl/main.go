@@ -46,7 +46,7 @@ func main() {
 		cli.StringFlag{
 			Name:  "output, o",
 			Usage: "Write output to a file, passing - outputs to stdout",
-			Value: "{{.Title}}.{{.Ext}}",
+			Value: "{{.Title}} [{{.ID}}].{{.Ext}}",
 		},
 		cli.BoolFlag{
 			Name:  "info, i",
@@ -163,6 +163,7 @@ func handler(identifier string, options options) {
 
 	if options.infoOnly {
 		fmt.Println("Title:", info.Title)
+		fmt.Println("ID:", info.ID)
 		fmt.Println("Author:", info.Author)
 		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
 		fmt.Println("Duration:", info.Duration)
@@ -215,6 +216,7 @@ func handler(identifier string, options options) {
 		var fileName string
 		fileName, err = createFileName(options.outputFile, outputFileName{
 			Title:         sanitizeFileNamePart(info.Title),
+			ID:            sanitizeFileNamePart(info.ID),
 			Ext:           sanitizeFileNamePart(format.Extension),
 			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
 			Resolution:    sanitizeFileNamePart(format.Resolution),

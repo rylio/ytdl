@@ -63,6 +63,7 @@ func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, er
 
 type outputFileName struct {
 	Title         string
+	ID            string
 	Author        string
 	Ext           string
 	DatePublished string
