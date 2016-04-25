@@ -9,8 +9,10 @@ import (
 func TestVideoInfo(t *testing.T) {
 	testCases := map[string]bool{
 		"https://www.youtube.com/watch?v=YQHsXMglC9A":            true,
-		"https://www.youtube.com/watch?v=H-30B0cqh88":            true,
 		"https://www.youtube.com/watch?v=qD8hOJoOGtk":            true,
+		"https://www.youtube.com/watch?v=H-30B0cqh88":            true,
+        // testable only in e.g. germany, because there's some rights-control issues in order this video evals 'false'
+		// "https://www.youtube.com/watch?v=FrG4TEcSuRg":            false,
 		"https://www.youtube.com/":                               false,
 		"https://www.youtube.com/watch?v=qHGTs1NSB1s":            true,
 		"https://www.facebook.com/video.php?v=10153820411888896": false,
@@ -24,8 +26,9 @@ func TestVideoInfo(t *testing.T) {
 	}
 }
 
+
 func TestDownloadVideo(t *testing.T) {
-	info, err := GetVideoInfo("https://www.youtube.com/watch?v=FrG4TEcSuRg")
+	info, err := GetVideoInfo("https://www.youtube.com/watch?v=WZb4lIvbRgQ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +40,7 @@ func TestDownloadVideo(t *testing.T) {
 }
 
 func TestThumbnail(t *testing.T) {
-	info, err := GetVideoInfo("https://www.youtube.com/watch?v=FrG4TEcSuRg")
+	info, err := GetVideoInfo("https://www.youtube.com/watch?v=WZb4lIvbRgQ")
 	if err != nil {
 		t.Fatal(err)
 	}

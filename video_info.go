@@ -88,7 +88,7 @@ func GetVideoInfoFromID(id string) (*VideoInfo, error) {
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+        return nil, err
 	}
 	return getVideoInfoFromHTML(id, body)
 }
@@ -172,15 +172,24 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, err
 		}
-		//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
-		re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\);</script>")
+        /*******************************************************************************
+		// previous defunct
+        re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
+        // [!] this regex doesn't catch anymore either - at least for some videos...
+        re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\);</script>")
+		*******************************************************************************/
+        // looking for sth. similar to: yt.setConfig({'PLAYER_CONFIG': {"attr":{},"sts":"12345","butloadmoreattrs":{...}}
+        // which either ends like this: ,'EXPERIMENTAL_TAGS': {
+        //                     or this: });
+        re = regexp.MustCompile("yt.setConfig\\(\\{'PLAYER_CONFIG'\\:[ ]?(\\{.*?\\})(,'[a-zA-Z\\_\\ \\-]+':[ ]?\\{|\\}\\);)")
 
 		matches := re.FindSubmatch(html)
 		if len(matches) < 2 {
-			return nil, fmt.Errorf("Error extracting sts from embedded url response")
+		    return nil, fmt.Errorf("Error extracting sts from embedded url response")
 		}
 		dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
-		err = dec.Decode(&jsonConfig)
+     
+        err = dec.Decode(&jsonConfig)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract json from embedded url: %s", err.Error())
 		}
@@ -190,9 +199,9 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			"eurl":     []string{youtubeVideoEURL + id},
 		}
 
-		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
-		if err != nil {
-			return nil, fmt.Errorf("Error fetching video info: %s", err.Error())
+        resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
+        if err != nil {
+            return nil, fmt.Errorf("Error fetching video info: %s", err.Error())
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
@@ -213,11 +222,12 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			}
 		}
 		jsonConfig["args"] = args
+
 	}
 
 	inf := jsonConfig["args"].(map[string]interface{})
-	if status, ok := inf["status"].(string); ok && status == "fail" {
-		return nil, fmt.Errorf("Error %d:%s", inf["errorcode"], inf["reason"])
+    if status, ok := inf["status"].(string); ok && status == "fail" {
+		return nil, fmt.Errorf("Error %s:%s", inf["errorcode"], inf["reason"])
 	}
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
