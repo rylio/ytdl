@@ -38,7 +38,7 @@ To install: ``go get -u github.com/otium/ytdl/...``
       - ```res``` - resolution of video
       - ```videnc``` - video encoding
       - ```audenc``` - audio encoding
-      - ```prof``` - youtube video profile
+      - ```itag``` - youtube video profile
       - ```audbr``` - audio bitrate
    - Default filters
       - ```ext:mp4```
@@ -47,8 +47,8 @@ To install: ``go get -u github.com/otium/ytdl/...``
       - ```best```
  - ```--output, -o``` - Output to specific path
    - Supports templates, ex: {{.Title}}.{{.Ext}}
-   - Defaults to ```{{.Title}}.{{.Ext}}```
-   - Supported template variables are Title, Ext, DatePublished, Resolution
+   - Defaults to ```{{.Title}} [{{.ID}}].{{.Ext}}```
+   - Supported template variables are Title, ID, Author, Ext, DatePublished, Resolution, Duration (case sensitive!)
    - Pass - to output to stdout, former stdout output is redirected to stderr
  - ```--info, -i``` - Just gets video info, outputs to stdout
  - ```--no-progress``` - Disables the progress bar
