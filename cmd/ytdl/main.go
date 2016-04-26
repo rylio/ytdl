@@ -161,23 +161,6 @@ func handler(identifier string, options options) {
 		return
 	}
 
-	if options.infoOnly {
-		fmt.Println("Title:", info.Title)
-		fmt.Println("ID:", info.ID)
-		fmt.Println("Author:", info.Author)
-		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
-		fmt.Println("Duration:", info.Duration)
-		return
-	} else if options.json {
-		var data []byte
-		data, err = json.MarshalIndent(info, "", "\t")
-		if err != nil {
-			err = fmt.Errorf("Unable to marshal json: %s", err.Error())
-			return
-		}
-		fmt.Println(string(data))
-		return
-	}
 
 	formats := info.Formats
 	// parse filter arguments, and filter through formats
@@ -212,8 +195,46 @@ func handler(identifier string, options options) {
 		}
 		return
 	}
+    
+    var fileName string
+    fileName, err = createFileName(options.outputFile, outputFileName{
+        Title:         sanitizeFileNamePart(info.Title),
+        ID:            sanitizeFileNamePart(info.ID),
+        Ext:           sanitizeFileNamePart(format.Extension),
+        DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
+        Resolution:    sanitizeFileNamePart(format.Resolution),
+        Author:        sanitizeFileNamePart(info.Author),
+        Duration:      sanitizeFileNamePart(info.Duration.String()),
+    })
+    if err != nil {
+        err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
+        return
+    } 		
+	
+    if options.infoOnly {
+        fmt.Println("Title:", info.Title)
+		fmt.Println("ID:", info.ID)
+		fmt.Println("Author:", info.Author)
+		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
+		fmt.Println("Duration:", info.Duration)
+        if options.outputFile != "-" {
+            fmt.Println("Filename:", fileName)
+        }
+		return
+	} else if options.json {
+		var data []byte
+		data, err = json.MarshalIndent(info, "", "\t")
+		if err != nil {
+			err = fmt.Errorf("Unable to marshal json: %s", err.Error())
+			return
+		}
+		fmt.Println(string(data))
+		return
+	}
+    
 	if out == nil {
-		var fileName string
+		/*
+        var fileName string
 		fileName, err = createFileName(options.outputFile, outputFileName{
 			Title:         sanitizeFileNamePart(info.Title),
 			ID:            sanitizeFileNamePart(info.ID),
@@ -226,7 +247,8 @@ func handler(identifier string, options options) {
 		if err != nil {
 			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
 			return
-		}
+		} 
+        */
 		// Create file truncate if append flag is not set
 		flags := os.O_CREATE | os.O_WRONLY
 		if options.append {

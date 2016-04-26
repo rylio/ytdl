@@ -86,10 +86,23 @@ func createFileName(template string, values outputFileName) (string, error) {
 	return string(buf.String()), nil
 }
 
-var illegalFileNameCharacters = regexp.MustCompile(`[^[a-zA-Z0-9]-_]`)
-
 func sanitizeFileNamePart(part string) string {
-	part = strings.Replace(part, "/", "-", -1)
-	part = illegalFileNameCharacters.ReplaceAllString(part, "")
-	return part
+	
+    // this should satisfy unix
+    part = strings.Replace(part, "/", "-", -1)
+	
+    // some additional replacements for windows
+	part = strings.Replace(part, "\\", "-", -1)
+    part = strings.Replace(part, ":", "-", -1)
+	part = strings.Replace(part, "|", "#", -1)
+	part = strings.Replace(part, ">", "#", -1)
+	part = strings.Replace(part, "<", "#", -1)
+	part = strings.Replace(part, "*", "#", -1)
+	part = strings.Replace(part, "?", ".", -1)
+    
+    // everything not alphanumeric or _.,;#<blank> will be removed here
+    catchUnsafeChars := regexp.MustCompile("[^a-zA-Z0-9-_.,;# ]")
+	part = catchUnsafeChars.ReplaceAllString(part, "")
+	
+    return part
 }
