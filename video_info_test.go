@@ -10,7 +10,7 @@ func TestVideoInfo(t *testing.T) {
 	testCases := map[string]bool{
 		"https://www.youtube.com/watch?v=YQHsXMglC9A":            true,
 		"https://www.youtube.com/watch?v=H-30B0cqh88":            true,
-		"https://www.youtube.com/watch?v=qD8hOJoOGtk":            true,
+		"https://www.youtube.com/watch?v=dQw4w9WgXcQ":            true,
 		"https://www.youtube.com/":                               false,
 		"https://www.youtube.com/watch?v=qHGTs1NSB1s":            true,
 		"https://www.facebook.com/video.php?v=10153820411888896": false,
