@@ -90,7 +90,7 @@ func main() {
 		},
 	}
 
-	app.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) error {
 		identifier := c.Args().First()
 		if identifier == "" || c.Bool("help") {
 			cli.ShowAppHelp(c)
@@ -118,6 +118,7 @@ func main() {
 			}
 			handler(identifier, options)
 		}
+		return nil
 	}
 	app.Run(os.Args)
 }
