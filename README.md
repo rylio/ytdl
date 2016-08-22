@@ -1,8 +1,8 @@
-# ytdl [![Build Status](https://travis-ci.org/otium/ytdl.svg)](https://travis-ci.org/otium/ytdl) [![GoDoc](https://godoc.org/github.com/codegangsta/cli?status.svg)](https://godoc.org/github.com/otium/ytdl)
+# ytdl [![Build Status](https://travis-ci.org/rylio/ytdl.svg)](https://travis-ci.org/rylio/ytdl) [![GoDoc](https://godoc.org/github.com/rylio/ytdl?status.svg)](https://godoc.org/github.com/rylio/ytdl)
 ------
 Go library for downloading YouTube videos
 
-[Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/ytdl "ytdl")
+[Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/rylio "ytdl")
 
 ## Example
 
@@ -20,7 +20,7 @@ vid.Download(file)
 
 ## ytdl CLI
 
-To install: ``go get -u github.com/otium/ytdl/...``
+To install: ``go get -u github.com/rylio/ytdl/...``
 
 ### Usage
 ``` ytdl [global options] [youtube url or video id] ```
