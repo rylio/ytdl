@@ -2,7 +2,7 @@
 ------
 Go library for downloading YouTube videos
 
-[Documentation: https://godoc.org/github.com/otium/ytdl](https://godoc.org/github.com/otium/rylio "ytdl")
+[Documentation: https://godoc.org/github.com/rylio/ytdl](https://godoc.org/github.com/rylio/ytdl "ytdl")
 
 ## Example
 
