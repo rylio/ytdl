@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/otium/ytdl"
+	"github.com/rylio/ytdl"
 )
 
 func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, error) {
