@@ -115,8 +115,12 @@ var swapRegexp = regexp.MustCompile(fmt.Sprintf(
 	"(?m)(?:^|,)(%s)%s", jsvarStr, swapStr))
 
 func getSigTokens(htmlPlayerFile string) ([]string, error) {
-	htmlPlayerFile = "http:" + htmlPlayerFile
-	resp, err := http.Get(htmlPlayerFile)
+	u, _ := url.Parse(youtubeBaseURL)
+	p, err := url.Parse(htmlPlayerFile)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.Get(u.ResolveReference(p).String())
 	if err != nil {
 		return nil, err
 	}
