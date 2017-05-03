@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,13 +49,16 @@ type VideoInfo struct {
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
 func GetVideoInfo(value interface{}) (*VideoInfo, error) {
-	switch value.(type) {
+	switch t := value.(type) {
 	case *url.URL:
-		return GetVideoInfoFromURL(value.(*url.URL))
+		return GetVideoInfoFromURL(t)
 	case string:
-		u, err := url.ParseRequestURI(value.(string))
+		u, err := url.ParseRequestURI(t)
 		if err != nil {
-			return GetVideoInfoFromID(value.(string))
+			return GetVideoInfoFromID(t)
+		}
+		if u.Host == "youtu.be" {
+			return GetVideoInfoFromShortURL(u)
 		}
 		return GetVideoInfoFromURL(u)
 	default:
@@ -69,6 +73,16 @@ func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
 		return nil, fmt.Errorf("Invalid youtube url, no video id")
 	}
 	return GetVideoInfoFromID(videoID)
+}
+
+// GetVideoInfoFromShortURL fetches video info from a short youtube url
+func GetVideoInfoFromShortURL(u *url.URL) (*VideoInfo, error) {
+	if len(u.Path) >= 1 {
+		if path := u.Path[1:]; path != "" {
+			return GetVideoInfoFromID(path)
+		}
+	}
+	return nil, errors.New("Could not parse short URL")
 }
 
 // GetVideoInfoFromID fetches video info from a youtube video id
