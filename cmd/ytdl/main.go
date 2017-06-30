@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/cheggaaa/pb"
 	"github.com/codegangsta/cli"
+	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
 	"github.com/rylio/ytdl"
 )
@@ -134,6 +136,10 @@ func handler(identifier string, options options) {
 
 	var out io.Writer
 	var logOut io.Writer = os.Stdout
+	if runtime.GOOS == "windows" && isatty.IsTerminal(os.Stdout.Fd()) {
+		logOut = colorable.NewColorableStdout()
+		log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	}
 	// if downloading to stdout, set log output to stderr, not sure if this is correct
 	if options.outputFile == "-" {
 		out = os.Stdout
