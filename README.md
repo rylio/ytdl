@@ -23,7 +23,7 @@ vid.Download(file)
 To install: ``go get -u github.com/rylio/ytdl/...``
 
 ### Usage
-``` ytdl [global options] [youtube url or video id] ```
+``` ytdl [global options] [list of youtube urls or video ids] ```
 ### Options
  - ```--help, -h``` - show help
  - ```--filter, -f``` - Filter out formats
