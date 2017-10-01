@@ -94,6 +94,7 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		identifier := c.Args().First()
+		identifiers := makeIdentifiersSlice(identifier, c.Args().Tail())
 		if identifier == "" || c.Bool("help") {
 			cli.ShowAppHelp(c)
 		} else {
@@ -118,11 +119,26 @@ func main() {
 					fmt.Sprint("best"),
 				}
 			}
-			handler(identifier, options)
+			handleAll(identifiers, options)
 		}
 		return nil
 	}
 	app.Run(os.Args)
+}
+
+func makeIdentifiersSlice(first string, rest []string) []string {
+	var identifiers []string
+	identifiers = append(identifiers, first)
+	for _, id := range rest {
+		identifiers = append(identifiers, id)
+	}
+	return identifiers
+}
+func handleAll(identifiers []string, options options) {
+	log.Info("Fetching ", len(identifiers), " videos")
+	for _, identifier := range identifiers {
+		handler(identifier, options)
+	}
 }
 
 func handler(identifier string, options options) {
