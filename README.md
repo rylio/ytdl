@@ -89,6 +89,14 @@ Print download url without downloading the content
 ytdl -f itag:22 --download-url 'https://www.youtube.com/watch?v=9bZkp7q19f0'
 ```
 
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
 ## License
 
 ytdl is released under the MIT License, see LICENSE for more details.
