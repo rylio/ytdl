@@ -63,6 +63,32 @@ To install: `go get -u github.com/rylio/ytdl/...`
 - `--version, -v` - print out ytdl cli version
 - `--start-offset` - offset the beginning of the video by a duration of time(e.g. 20s or 1m)
 
+### Examples
+
+Download content based on itag
+
+```bash
+ytdl -f itag:22 'https://www.youtube.com/watch?v=9bZkp7q19f0'
+```
+
+Get all download formats (Requires [jq](https://github.com/stedolan/jq) to be installed)
+
+```bash
+./ytdl -j 'http://youtube.com/watch?v=9bZkp7q19f0' | jq ".formats"
+```
+
+Extract title of the video (Requires [jq](https://github.com/stedolan/jq) to be installed)
+
+```bash
+ytdl -j 'http://youtube.com/watch?v=9bZkp7q19f0' | jq ".title"
+```
+
+Print download url without downloading the content
+
+```bash
+ytdl -f itag:22 --download-url 'https://www.youtube.com/watch?v=9bZkp7q19f0'
+```
+
 ## License
 
 ytdl is released under the MIT License, see LICENSE for more details.
