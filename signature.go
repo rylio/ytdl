@@ -91,7 +91,7 @@ const (
 		"a\\.splice\\(0,b\\)" +
 		"\\}"
 	swapStr = ":function\\(a,b\\)\\{" +
-		"var c=a\\[0\\];a\\[0\\]=a\\[b%a\\.length\\];a\\[b\\]=c(?:;return a)?" +
+		"var c=a\\[0\\];a\\[0\\]=a\\[b%a\\.length\\];a\\[b(?:%a\\.length)?\\]=c(?:;return a)?" +
 		"\\}"
 )
 
