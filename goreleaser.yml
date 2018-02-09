@@ -1,0 +1,9 @@
+builds:
+  - main: ./cmd/ytdl/main.go
+    binary: ytdl
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
