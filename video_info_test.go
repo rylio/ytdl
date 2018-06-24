@@ -35,6 +35,7 @@ func TestGetDownloadURL(t *testing.T) {
 		"https://www.youtube.com/watch?v=aQZDbBGBJsM",
 		"https://www.youtube.com/watch?v=cRS4mS4gKwg",
 		"https://www.youtube.com/watch?v=0fllyJTBsRU",
+		"https://www.youtube.com/watch?v=yx0PEdDCle4",
 	}
 	for _, url := range testCases {
 		info, err := GetVideoInfo(url)
