@@ -198,12 +198,19 @@ func handler(identifier string, options options) {
 		var data [][]string
 
 		for _, format := range info.Formats {
-			data = append(data, []string{strconv.Itoa(format.Itag), format.Extension, format.Resolution, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
+			var fps string
+			if format.AccessMeta("fps") == nil {
+				fps = "n/a"
+			} else {
+				fps = format.AccessMeta("fps").(string)
+			}
+
+			data = append(data, []string{strconv.Itoa(format.Itag), format.Extension, format.Resolution, fps, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
 		}
 		sort.Sort(byResolution(data))
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"itag", "ext", "res", "vEncoding", "aEncoding", "aBitrate"})
+		table.SetHeader([]string{"itag", "ext", "res", "fps", "vEncoding", "aEncoding", "aBitrate"})
 
 		for _, v := range data {
 			table.Append(v)

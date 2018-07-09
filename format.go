@@ -77,6 +77,10 @@ func (f Format) CompareKey(other Format, key FormatKey) int {
 	}
 }
 
+func (f Format) AccessMeta(field string) interface{} {
+	return f.meta[field]
+}
+
 // FORMATS is a map of all itags and their formats
 var FORMATS = map[int]Format{
 	5: Format{
