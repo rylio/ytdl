@@ -17,20 +17,25 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/rylio/ytdl"
 	log "github.com/sirupsen/logrus"
+	"github.com/olekukonko/tablewriter"
+	"sort"
 )
 
+type byResolution [][]string
+
 type options struct {
-	noProgress  bool
-	outputFile  string
-	infoOnly    bool
-	silent      bool
-	debug       bool
-	append      bool
-	filters     []string
-	downloadURL bool
-	byteRange   string
-	json        bool
-	startOffset string
+	noProgress     bool
+	outputFile     string
+	infoOnly       bool
+	silent         bool
+	debug          bool
+	append         bool
+	filters        []string
+	downloadURL    bool
+	byteRange      string
+	json           bool
+	startOffset    string
+	downloadOption bool
 }
 
 func main() {
@@ -90,6 +95,10 @@ func main() {
 			Name:  "start-offset",
 			Usage: "Offset the start of the video by time",
 		},
+		cli.BoolFlag{
+			Name:  "download-option, p",
+			Usage: "Print video and audio download options",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -109,6 +118,7 @@ func main() {
 				byteRange:   c.String("range"),
 				json:        c.Bool("json"),
 				startOffset: c.String("start-offset"),
+				downloadOption:      c.Bool("download-option"),
 			}
 			if len(options.filters) == 0 {
 				options.filters = cli.StringSlice{
@@ -126,6 +136,7 @@ func main() {
 }
 
 func handler(identifier string, options options) {
+	var itag int
 	var err error
 	defer func() {
 		if err != nil {
@@ -183,16 +194,48 @@ func handler(identifier string, options options) {
 		}
 		fmt.Println(string(data))
 		return
+	} else if options.downloadOption {
+		var data [][]string
+
+		for _, format := range info.Formats {
+			data = append(data, []string{strconv.Itoa(format.Itag), format.Extension, format.Resolution, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
+		}
+		sort.Sort(byResolution(data))
+
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"itag", "ext", "res", "vEncoding", "aEncoding", "aBitrate"})
+
+		for _, v := range data {
+			table.Append(v)
+		}
+		table.Render() // Send output
+
+		fmt.Print("Enter the itag of the file you would like to download or enter 0 to abort: ")
+		_, err := fmt.Scanf("%d", &itag)
+		if err != nil {
+			return
+		} else if itag == 0 {
+			return
+		}
 	}
 
 	formats := info.Formats
-	// parse filter arguments, and filter through formats
-	for _, filter := range options.filters {
-		filter, err := parseFilter(filter)
+
+	if itag != 0 {
+		filter, err := parseFilter(fmt.Sprintf("itag:%d", itag))
 		if err == nil {
 			formats = filter(formats)
 		}
+	} else {
+		// parse filter arguments, and filter through formats
+		for _, filter := range options.filters {
+			filter, err := parseFilter(filter)
+			if err == nil {
+				formats = filter(formats)
+			}
+		}
 	}
+
 	if len(formats) == 0 {
 		err = fmt.Errorf("No formats available that match criteria")
 		return
@@ -287,4 +330,26 @@ func handler(identifier string, options options) {
 		out = io.MultiWriter(out, progressBar)
 	}
 	_, err = io.Copy(out, resp.Body)
+}
+
+func (s byResolution) Len() int {
+	return len(s)
+}
+func (s byResolution) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s byResolution) Less(i, j int) bool {
+	if s[i][2] == "" {
+		return false
+	} else if s[j][2] == "" {
+		return true
+	}
+
+	if len(s[i][2]) < len(s[j][2]) {
+		return false
+	} else if len(s[i][2]) > len(s[j][2]) {
+		return true
+	}
+
+	return s[i][2] > s[j][2]
 }
