@@ -17,20 +17,22 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/rylio/ytdl"
 	log "github.com/sirupsen/logrus"
+	"github.com/olekukonko/tablewriter"
 )
 
 type options struct {
-	noProgress  bool
-	outputFile  string
-	infoOnly    bool
-	silent      bool
-	debug       bool
-	append      bool
-	filters     []string
-	downloadURL bool
-	byteRange   string
-	json        bool
-	startOffset string
+	noProgress     bool
+	outputFile     string
+	infoOnly       bool
+	silent         bool
+	debug          bool
+	append         bool
+	filters        []string
+	downloadURL    bool
+	byteRange      string
+	json           bool
+	startOffset    string
+	downloadOption bool
 }
 
 func main() {
@@ -90,6 +92,10 @@ func main() {
 			Name:  "start-offset",
 			Usage: "Offset the start of the video by time",
 		},
+		cli.BoolFlag{
+			Name:  "download-option, p",
+			Usage: "Print video and audio download options",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -109,6 +115,7 @@ func main() {
 				byteRange:   c.String("range"),
 				json:        c.Bool("json"),
 				startOffset: c.String("start-offset"),
+				downloadOption:      c.Bool("download-option"),
 			}
 			if len(options.filters) == 0 {
 				options.filters = cli.StringSlice{
@@ -126,6 +133,7 @@ func main() {
 }
 
 func handler(identifier string, options options) {
+	var itag int
 	var err error
 	defer func() {
 		if err != nil {
@@ -183,16 +191,55 @@ func handler(identifier string, options options) {
 		}
 		fmt.Println(string(data))
 		return
+	} else if options.downloadOption {
+		var data [][]string
+
+		info.Formats.Sort(ytdl.FormatResolutionKey, true)
+		for _, format := range info.Formats {
+			var fps string
+			if format.ValueForKey("fps") == nil {
+				fps = "n/a"
+			} else {
+				fps = format.ValueForKey("fps").(string)
+			}
+
+			data = append(data, []string{strconv.Itoa(format.Itag), format.Extension, format.Resolution, fps, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
+		}
+
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"itag", "ext", "res", "fps", "vEncoding", "aEncoding", "aBitrate"})
+
+		for _, v := range data {
+			table.Append(v)
+		}
+		table.Render() // Send output
+
+		fmt.Print("Enter the itag of the file you would like to download or enter 0 to abort: ")
+		_, err := fmt.Scanf("%d", &itag)
+		if err != nil {
+			return
+		} else if itag == 0 {
+			return
+		}
 	}
 
 	formats := info.Formats
-	// parse filter arguments, and filter through formats
-	for _, filter := range options.filters {
-		filter, err := parseFilter(filter)
+
+	if itag != 0 {
+		filter, err := parseFilter(fmt.Sprintf("itag:%d", itag))
 		if err == nil {
 			formats = filter(formats)
 		}
+	} else {
+		// parse filter arguments, and filter through formats
+		for _, filter := range options.filters {
+			filter, err := parseFilter(filter)
+			if err == nil {
+				formats = filter(formats)
+			}
+		}
 	}
+
 	if len(formats) == 0 {
 		err = fmt.Errorf("No formats available that match criteria")
 		return
