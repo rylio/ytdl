@@ -18,6 +18,10 @@ func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, er
 		return func(formats ytdl.FormatList) ytdl.FormatList {
 			return formats.Extremes(ytdl.FormatResolutionKey, filterString == "best").Extremes(ytdl.FormatAudioBitrateKey, filterString == "best")
 		}, nil
+	case "best-fps", "worst-fps":
+		return func(formats ytdl.FormatList) ytdl.FormatList {
+			return formats.Extremes(ytdl.FormatFPSKey, filterString == "best-fps").Extremes(ytdl.FormatResolutionKey, filterString == "best-fps").Extremes(ytdl.FormatAudioBitrateKey, filterString == "best-fps")
+		}, nil
 	case "best-video", "worst-video":
 		return func(formats ytdl.FormatList) ytdl.FormatList {
 			return formats.Extremes(ytdl.FormatResolutionKey, strings.HasPrefix(filterString, "best"))

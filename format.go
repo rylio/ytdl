@@ -13,6 +13,7 @@ const (
 	FormatAudioEncodingKey FormatKey = "audenc"
 	FormatItagKey          FormatKey = "itag"
 	FormatAudioBitrateKey  FormatKey = "audbr"
+	FormatFPSKey           FormatKey = "fps"
 )
 
 // Format is a youtube is a static youtube video format
@@ -72,13 +73,19 @@ func (f Format) CompareKey(other Format, key FormatKey) int {
 		return res1 - res2
 	case FormatAudioBitrateKey:
 		return f.ValueForKey(key).(int) - other.ValueForKey(key).(int)
+	case FormatFPSKey:
+		if f.ValueForKey(key) == nil {
+			return -1
+		} else if other.ValueForKey(key) == nil {
+			return 1
+		} else {
+			a, _ := strconv.Atoi(f.ValueForKey(key).(string))
+			b, _ := strconv.Atoi(other.ValueForKey(key).(string))
+			return a - b
+		}
 	default:
 		return 0
 	}
-}
-
-func (f Format) AccessMeta(field string) interface{} {
-	return f.meta[field]
 }
 
 // FORMATS is a map of all itags and their formats

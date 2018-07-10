@@ -18,10 +18,7 @@ import (
 	"github.com/rylio/ytdl"
 	log "github.com/sirupsen/logrus"
 	"github.com/olekukonko/tablewriter"
-	"sort"
 )
-
-type byResolution [][]string
 
 type options struct {
 	noProgress     bool
@@ -197,17 +194,17 @@ func handler(identifier string, options options) {
 	} else if options.downloadOption {
 		var data [][]string
 
+		info.Formats.Sort(ytdl.FormatResolutionKey, true)
 		for _, format := range info.Formats {
 			var fps string
-			if format.AccessMeta("fps") == nil {
+			if format.ValueForKey("fps") == nil {
 				fps = "n/a"
 			} else {
-				fps = format.AccessMeta("fps").(string)
+				fps = format.ValueForKey("fps").(string)
 			}
 
 			data = append(data, []string{strconv.Itoa(format.Itag), format.Extension, format.Resolution, fps, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
 		}
-		sort.Sort(byResolution(data))
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"itag", "ext", "res", "fps", "vEncoding", "aEncoding", "aBitrate"})
@@ -337,26 +334,4 @@ func handler(identifier string, options options) {
 		out = io.MultiWriter(out, progressBar)
 	}
 	_, err = io.Copy(out, resp.Body)
-}
-
-func (s byResolution) Len() int {
-	return len(s)
-}
-func (s byResolution) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s byResolution) Less(i, j int) bool {
-	if s[i][2] == "" {
-		return false
-	} else if s[j][2] == "" {
-		return true
-	}
-
-	if len(s[i][2]) < len(s[j][2]) {
-		return false
-	} else if len(s[i][2]) > len(s[j][2]) {
-		return true
-	}
-
-	return s[i][2] > s[j][2]
 }
