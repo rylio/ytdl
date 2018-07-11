@@ -34,6 +34,7 @@ To install: `go get -u github.com/rylio/ytdl/...`
     - Shortcuts for best/worst(e.g. `-f best`)
       - `best`/`worst` - best/worst video and audio
       - `best-video`/`worst-video` - best/worst video
+      - `best-fps`/`worst-fps` - best/worst video with fps as the first priority      
       - `best-audio`/`worst-audio` - best/worst audio
   - To exclude:  -f !key:value1,...
   - Available keys (See format.go for available values):
@@ -62,6 +63,8 @@ To install: `go get -u github.com/rylio/ytdl/...`
 - `--download-url, -u` - just print download url to, don't do anything else
 - `--version, -v` - print out ytdl cli version
 - `--start-offset` - offset the beginning of the video by a duration of time(e.g. 20s or 1m)
+- `--download-option, -p` - Print video and audio download options and accept input interactively
+
 
 ### Examples
 
@@ -69,6 +72,12 @@ Download content based on itag
 
 ```bash
 ytdl -f itag:22 'https://www.youtube.com/watch?v=9bZkp7q19f0'
+```
+
+Download content with the best fps
+
+```bash
+ytdl -f best-fps 'https://www.youtube.com/watch?v=9bZkp7q19f0'
 ```
 
 Get all download formats (Requires [jq](https://github.com/stedolan/jq) to be installed)
@@ -87,6 +96,12 @@ Print download url without downloading the content
 
 ```bash
 ytdl -f itag:22 --download-url 'https://www.youtube.com/watch?v=9bZkp7q19f0'
+```
+
+Print video and audio download options and accept input interactively
+
+```bash
+ytdl -p 'https://www.youtube.com/watch?v=9bZkp7q19f0'
 ```
 
 ## Contributing
