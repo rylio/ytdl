@@ -29,13 +29,12 @@ func TestVideoInfo(t *testing.T) {
 func TestGetDownloadURL(t *testing.T) {
 	testCases := []string{
 		"https://www.youtube.com/watch?v=FrG4TEcSuRg",
-		"https://www.youtube.com/watch?v=1gOQiFEwnZ8",
+		"https://www.youtube.com/watch?v=jgVhBThJdXc",
 		"https://www.youtube.com/watch?v=MXgnIP4rMoI",
 		"https://www.youtube.com/watch?v=peBgUMT26jM",
 		"https://www.youtube.com/watch?v=aQZDbBGBJsM",
 		"https://www.youtube.com/watch?v=cRS4mS4gKwg",
 		"https://www.youtube.com/watch?v=0fllyJTBsRU",
-		"https://www.youtube.com/watch?v=yx0PEdDCle4",
 	}
 	for _, url := range testCases {
 		info, err := GetVideoInfo(url)
