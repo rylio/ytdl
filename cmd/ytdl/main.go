@@ -303,8 +303,11 @@ func handler(identifier string, options options) {
 	// if byte range flag is set, use http range header option
 	if options.byteRange != "" || options.append {
 		if options.byteRange == "" && out != os.Stdout {
-			if stat, err := out.(*os.File).Stat(); err != nil {
+			if stat, err := out.(*os.File).Stat(); err == nil {
 				options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
+			} else {
+				err = fmt.Errorf("Unable to retrieve the existing file's stat: %s", err.Error())
+				return
 			}
 		}
 		if options.byteRange != "" {
