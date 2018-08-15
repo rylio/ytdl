@@ -20,11 +20,14 @@ vid.Download(file)
 
 ## ytdl CLI
 
-To install: `go get -u github.com/rylio/ytdl/...`
+- To install: `go get -u github.com/rylio/ytdl/...`
+
+- Or use Docker image `docker pull brucwangno1/ytdl:1.0`
 
 ### Usage
 
-`ytdl [global options] [youtube url or video id]`
+- `ytdl [global options] [youtube url or video id]`
+- Or using Docker: `docker run -it --rm -v /directory/you/want/to/save/the/download/:/ytdl/ brucewangno1/ytdl:1.0 [global options] "[youtube url or video id]"`
 
 ### Options
 
