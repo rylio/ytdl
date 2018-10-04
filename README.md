@@ -22,7 +22,7 @@ vid.Download(file)
 
 - To install: `go get -u github.com/rylio/ytdl/...`
 
-- Or use Docker image `docker pull brucwangno1/ytdl:1.0`
+- Or use Docker image `docker pull brucewangno1/ytdl:1.0`
 
 ### Usage
 
