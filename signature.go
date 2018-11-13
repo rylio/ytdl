@@ -37,16 +37,11 @@ func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	} else {
 		return nil, fmt.Errorf("Couldn't extract url from format")
 	}
-	urlString, err := url.QueryUnescape(urlString)
-	if err != nil {
-		return nil, err
-	}
 	u, err := url.Parse(urlString)
 	if err != nil {
 		return nil, err
 	}
 	query := u.Query()
-	query.Set("ratebypass", "yes")
 	if len(sig) > 0 {
 		query.Set("signature", sig)
 	}

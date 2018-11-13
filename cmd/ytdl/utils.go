@@ -6,8 +6,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
-
-	"github.com/rylio/ytdl"
+	"ytdl"
 )
 
 func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, error) {
