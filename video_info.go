@@ -126,7 +126,6 @@ func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 	if err != nil {
 		return err
 	}
-
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return err
@@ -136,7 +135,6 @@ func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 		return fmt.Errorf("Invalid status code: %d", resp.StatusCode)
 	}
 	_, err = io.Copy(dest, resp.Body)
-	fmt.Println(err)
 	return err
 }
 
