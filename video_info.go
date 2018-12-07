@@ -187,7 +187,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			return nil, err
 		}
 		//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
-		re = regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);") // Fix of invalid regex @SogoCZE 6.12.2018 13:21
+		re = regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
 
 		matches := re.FindSubmatch(html)
 		if len(matches) < 2 {
