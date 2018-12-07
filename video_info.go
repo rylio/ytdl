@@ -126,6 +126,7 @@ func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 	if err != nil {
 		return err
 	}
+
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return err
@@ -135,6 +136,7 @@ func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 		return fmt.Errorf("Invalid status code: %d", resp.StatusCode)
 	}
 	_, err = io.Copy(dest, resp.Body)
+	fmt.Println(err)
 	return err
 }
 
@@ -187,7 +189,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			return nil, err
 		}
 		//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
-		re = regexp.MustCompile("yt.setConfig\\('PLAYER_CONFIG', (.*?)\\);</script>")
+		re = regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);") // Fix of invalid regex @SogoCZE 6.12.2018 13:21
 
 		matches := re.FindSubmatch(html)
 		if len(matches) < 2 {
