@@ -231,7 +231,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 	inf := jsonConfig["args"].(map[string]interface{})
 	if status, ok := inf["status"].(string); ok && status == "fail" {
-		return nil, fmt.Errorf("Error %d:%s", inf["errorcode"], inf["reason"])
+		return nil, fmt.Errorf("Error %s:%s", inf["errorcode"], inf["reason"])
 	}
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
