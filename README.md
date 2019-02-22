@@ -7,15 +7,26 @@ Go library for downloading YouTube videos
 ## Example
 
 ```go
+package main
+
 import (
-   "github.com/otium/ytdl"
-   "os"
+	"fmt"
+	"os"
+
+	"github.com/otium/ytdl"
 )
 
-vid, err := ytdl.GetVideoInfo("https://www.youtube.com/watch?v=1rZ-JorHJEY")
-file, _ = os.Create(vid.Title + ".mp4")
-defer file.Close()
-vid.Download(file)
+func main() {
+	vid, err := ytdl.GetVideoInfo("https://www.youtube.com/watch?v=WkVvG4QTO9M")
+	if err != nil {
+		fmt.Println("Failed to get video info")
+		return
+	}
+	file, _ := os.Create(vid.Title + ".mp4")
+	defer file.Close()
+	vid.Download(vid.Formats[0], file)
+}
+
 ```
 
 ## ytdl CLI
