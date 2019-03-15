@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/otium/ytdl"
+	"github.com/rylio/ytdl"
 )
 
 func main() {
