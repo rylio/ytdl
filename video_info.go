@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 const youtubeBaseURL = "https://www.youtube.com/watch"
@@ -152,13 +152,13 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	info.ID = id
 	dateStr, ok := doc.Find("meta[itemprop=\"datePublished\"]").Attr("content")
 	if !ok {
-		log.Debug("Unable to extract date published")
+		log.Debug().Msg("Unable to extract date published")
 	} else {
 		date, err := time.Parse(youtubeDateFormat, dateStr)
 		if err == nil {
 			info.DatePublished = date
 		} else {
-			log.Debug("Unable to parse date published", err.Error())
+			log.Debug().Msgf("Unable to parse date published %v", err)
 		}
 	}
 
@@ -173,13 +173,12 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			return nil, err
 		}
 	} else {
-		log.Debug("Unable to extract json from default url, trying embedded url")
+		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
 		jsonConfig, err = getVideoInfoFromEmbedded(id)
 		if err != nil {
 			return nil, err
 		}
-
 		query := url.Values{
 			"video_id": []string{id},
 			"eurl":     []string{youtubeVideoEURL + id},
@@ -235,23 +234,23 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			return nil, fmt.Errorf("Unavailable because: %s", playerResponse.PlayabilityStatus.Reason)
 		}
 	} else {
-		log.Debug("Unable to extract player response JSON")
+		log.Debug().Msg("Unable to extract player response JSON")
 	}
 
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
 	} else {
-		log.Debug("Unable to extract author")
+		log.Debug().Msg("Unable to extract author")
 	}
 
 	if length, ok := inf["length_seconds"].(string); ok {
 		if duration, err := strconv.ParseInt(length, 10, 64); err == nil {
 			info.Duration = time.Second * time.Duration(duration)
 		} else {
-			log.Debug("Unable to parse duration string: ", length)
+			log.Debug().Msgf("Unable to parse duration string: %v", length)
 		}
 	} else {
-		log.Debug("Unable to extract duration")
+		log.Debug().Msg("Unable to extract duration")
 	}
 
 	// For the future maybe
@@ -322,10 +321,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 				}
 				formats = append(formats, format)
 			} else {
-				log.Debug("No metadata found for itag: ", itag, ", skipping...")
+				log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
 			}
 		} else {
-			log.Debug("Unable to format string", err.Error())
+			log.Debug().Msgf("Unable to format string %v", err)
 		}
 	}
 
@@ -428,7 +427,7 @@ func getDashManifest(urlString string) (formats []Format, err error) {
 				}
 				formats = append(formats, format)
 			} else {
-				log.Debug("No metadata found for itag: ", rep.Itag, ", skipping...")
+				log.Debug().Msgf("No metadata found for itag: %v, skipping...", rep.Itag)
 			}
 		}
 	}
