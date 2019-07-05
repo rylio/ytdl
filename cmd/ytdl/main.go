@@ -12,8 +12,9 @@ import (
 
 	"github.com/mattn/go-isatty"
 	"github.com/olekukonko/tablewriter"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/rylio/ytdl"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -54,7 +55,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:  "silent, s",
-			Usage: "Only output errors",
+			Usage: "Only output errors, also disables progress bar",
 		},
 		cli.BoolFlag{
 			Name:  "debug, d",
@@ -128,8 +129,8 @@ func handler(identifier string, options options) {
 	var err error
 	defer func() {
 		if err != nil {
-			log.SetOutput(os.Stderr)
-			log.Fatal(err.Error())
+			log.Logger = log.Output(os.Stderr)
+			log.Fatal().Err(err).Msg("")
 		}
 	}()
 
@@ -141,21 +142,21 @@ func handler(identifier string, options options) {
 		out = os.Stdout
 		logOut = os.Stderr
 	}
-	log.SetOutput(logOut)
+	log.Logger = log.Output(logOut)
 
 	// ouput only errors or not
 	silent := options.outputFile == "" ||
 		options.silent || options.infoOnly || options.downloadURL || options.json
 	if silent {
-		log.SetLevel(log.FatalLevel)
+		log.Logger = log.Level(zerolog.FatalLevel)
 	} else if options.debug {
-		log.SetLevel(log.DebugLevel)
+		log.Logger = log.Level(zerolog.DebugLevel)
 	} else {
-		log.SetLevel(log.InfoLevel)
+		log.Logger = log.Level(zerolog.InfoLevel)
 	}
 
 	// TODO: Show activity indicator
-	log.Info("Fetching video info...")
+	log.Info().Msg("Fetching video info...")
 	//fmt.Print("\u001b[0G")
 	//fmt.Print("\u001b[2K")
 	info, err := ytdl.GetVideoInfo(identifier)
@@ -285,7 +286,7 @@ func handler(identifier string, options options) {
 		out = f
 	}
 
-	log.Info("Downloading to ", out.(*os.File).Name())
+	log.Info().Msgf("Downloading to %s", out.(*os.File).Name())
 	var req *http.Request
 	req, err = http.NewRequest("GET", downloadURL.String(), nil)
 	// if byte range flag is set, use http range header option
