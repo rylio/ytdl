@@ -33,12 +33,12 @@ func main() {
 
 - To install: `go get -u github.com/rylio/ytdl/...`
 
-- Or use Docker image `docker pull brucewangno1/ytdl:1.0`
+- Or use Docker image `docker pull brucewangno1/ytdl:2.0`
 
 ### Usage
 
 - `ytdl [global options] [youtube url or video id]`
-- Or using Docker: `docker run -it --rm -v /directory/you/want/to/save/the/download/:/ytdl/ brucewangno1/ytdl:1.0 [global options] "[youtube url or video id]"`
+- Or using Docker: `docker run -it --rm -v /directory/you/want/to/save/the/download/:/ytdl/ brucewangno1/ytdl:2.0 [global options] "[youtube url or video id]"`
 
 ### Options
 
