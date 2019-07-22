@@ -72,7 +72,6 @@ func main() {
 - `--no-progress` - Disables the progress bar
 - `--silent, -s` - Disables all output, except for fatal errors
 - `--debug, -d` - Output debug logs
-- `--append, -a` - append to output file, instead of truncating
 - `--range, -r` - specify a range of bytes, placed in http range header, ex: 0-100
 - `--download-url, -u` - just print download url to, don't do anything else
 - `--version, -v` - print out ytdl cli version

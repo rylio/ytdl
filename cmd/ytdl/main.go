@@ -279,13 +279,9 @@ func handler(identifier string, options options) {
 			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
 			return
 		}
-		// Create file truncate if append flag is not set
-		flags := os.O_CREATE | os.O_WRONLY
-		if options.append {
-			flags |= os.O_APPEND
-		} else {
-			flags |= os.O_TRUNC
-		}
+		// Create file append if file exists
+		flags := os.O_CREATE | os.O_WRONLY | os.O_APPEND
+
 		var f *os.File
 		// open as write only
 		f, err = os.OpenFile(fileName, flags, 0666)
@@ -301,21 +297,23 @@ func handler(identifier string, options options) {
 	var req *http.Request
 	req, err = http.NewRequest("GET", downloadURL.String(), nil)
 	// if byte range flag is set, use http range header option
-	if options.byteRange != "" || options.append {
-		if options.byteRange == "" && out != os.Stdout {
-			if stat, err := out.(*os.File).Stat(); err == nil {
-				options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
-			} else {
-				err = fmt.Errorf("Unable to retrieve the existing file's stat: %s", err.Error())
-				return
-			}
-		}
-		if options.byteRange != "" {
-			req.Header.Set("Range", "bytes="+options.byteRange)
+	if options.byteRange == "" && out != os.Stdout {
+		if stat, err := out.(*os.File).Stat(); err == nil {
+			options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
+		} else {
+			err = fmt.Errorf("Unable to retrieve the existing file's stat: %s", err.Error())
+			return
 		}
 	}
+	if options.byteRange != "" {
+		req.Header.Set("Range", "bytes="+options.byteRange)
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		if resp.StatusCode == 416 {
+			err = fmt.Errorf("Received status code %d REQUESTED RANGE NOT SATISFIABLE from download url. This is either because the HTTP request header range is not satisfiable or the file to download is already intact.", resp.StatusCode)
+		}
 		if err == nil {
 			err = fmt.Errorf("Received status code %d from download url", resp.StatusCode)
 		}
