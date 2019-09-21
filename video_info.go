@@ -198,8 +198,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract json from embedded url: %s", err.Error())
 		}
+
+		sts, _ := jsonConfig["sts"].(float64)
 		query := url.Values{
-			"sts":      []string{strconv.Itoa(int(jsonConfig["sts"].(float64)))},
+			"sts":      []string{strconv.Itoa(int(sts))},
 			"video_id": []string{id},
 			"eurl":     []string{youtubeVideoEURL + id},
 		}
