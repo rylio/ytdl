@@ -198,10 +198,14 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract json from embedded url: %s", err.Error())
 		}
+
 		query := url.Values{
-			"sts":      []string{strconv.Itoa(int(jsonConfig["sts"].(float64)))},
 			"video_id": []string{id},
 			"eurl":     []string{youtubeVideoEURL + id},
+		}
+
+		if sts, ok := jsonConfig["sts"].(float64); ok {
+			query["sts"] = []string{strconv.Itoa(int(sts))}
 		}
 
 		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
@@ -233,6 +237,26 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	if status, ok := inf["status"].(string); ok && status == "fail" {
 		return nil, fmt.Errorf("Error %d:%s", inf["errorcode"], inf["reason"])
 	}
+
+	if playerResponseJSON, ok := inf["player_response"].(string); ok {
+		var playerResponse struct {
+			PlayabilityStatus struct {
+				Status string `json:"status"`
+				Reason string `json:"reason"`
+			} `json:"playabilityStatus"`
+		}
+
+		if err := json.Unmarshal([]byte(playerResponseJSON), &playerResponse); err != nil {
+			return nil, fmt.Errorf("Couldn't parse player response: %s", err.Error())
+		}
+
+		if playerResponse.PlayabilityStatus.Status != "OK" {
+			return nil, fmt.Errorf("Unavailable because: %s", playerResponse.PlayabilityStatus.Reason)
+		}
+	} else {
+		log.Debug("Unable to extract player response JSON")
+	}
+
 	if a, ok := inf["author"].(string); ok {
 		info.Author = a
 	} else {
