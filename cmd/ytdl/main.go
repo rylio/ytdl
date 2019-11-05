@@ -160,7 +160,7 @@ func handler(identifier string, options options) {
 	//fmt.Print("\u001b[2K")
 	info, err := ytdl.GetVideoInfo(identifier)
 	if err != nil {
-		err = fmt.Errorf("Unable to fetch video info: %s", err.Error())
+		err = fmt.Errorf("Unable to fetch video info: %w", err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func handler(identifier string, options options) {
 		var data []byte
 		data, err = json.MarshalIndent(info, "", "\t")
 		if err != nil {
-			err = fmt.Errorf("Unable to marshal json: %s", err.Error())
+			err = fmt.Errorf("Unable to marshal json: %w", err)
 			return
 		}
 		fmt.Println(string(data))
@@ -235,7 +235,7 @@ func handler(identifier string, options options) {
 	format := formats[0]
 	downloadURL, err := info.GetDownloadURL(format)
 	if err != nil {
-		err = fmt.Errorf("Unable to get download url: %s", err.Error())
+		err = fmt.Errorf("Unable to get download url: %w", err)
 		return
 	}
 	if options.startOffset != "" {
@@ -264,7 +264,7 @@ func handler(identifier string, options options) {
 			Duration:      sanitizeFileNamePart(info.Duration.String()),
 		})
 		if err != nil {
-			err = fmt.Errorf("Unable to parse output file file name: %s", err.Error())
+			err = fmt.Errorf("Unable to parse output file file name: %w", err)
 			return
 		}
 		// Create file truncate if append flag is not set
@@ -278,7 +278,7 @@ func handler(identifier string, options options) {
 		// open as write only
 		f, err = os.OpenFile(fileName, flags, 0666)
 		if err != nil {
-			err = fmt.Errorf("Unable to open output file: %s", err.Error())
+			err = fmt.Errorf("Unable to open output file: %w", err)
 			return
 		}
 		defer f.Close()
@@ -294,7 +294,7 @@ func handler(identifier string, options options) {
 			if stat, err := out.(*os.File).Stat(); err == nil {
 				options.byteRange = strconv.FormatInt(stat.Size(), 10) + "-"
 			} else {
-				err = fmt.Errorf("Unable to retrieve the existing file's stat: %s", err.Error())
+				err = fmt.Errorf("Unable to retrieve the existing file's stat: %w", err)
 				return
 			}
 		}
@@ -307,7 +307,7 @@ func handler(identifier string, options options) {
 		if err == nil {
 			err = fmt.Errorf("Received status code %d from download url", resp.StatusCode)
 		}
-		err = fmt.Errorf("Unable to start download: %s", err.Error())
+		err = fmt.Errorf("Unable to start download: %w", err)
 		return
 	}
 	defer resp.Body.Close()

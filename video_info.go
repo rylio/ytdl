@@ -196,7 +196,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
 		err = dec.Decode(&jsonConfig)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to extract json from embedded url: %s", err.Error())
+			return nil, fmt.Errorf("Unable to extract json from embedded url: %w", err)
 		}
 
 		query := url.Values{
@@ -210,7 +210,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
 		if err != nil {
-			return nil, fmt.Errorf("Error fetching video info: %s", err.Error())
+			return nil, fmt.Errorf("Error fetching video info: %w", err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
@@ -218,11 +218,11 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to read video info response body: %s", err.Error())
+			return nil, fmt.Errorf("Unable to read video info response body: %w", err)
 		}
 		query, err = url.ParseQuery(string(body))
 		if err != nil {
-			return nil, fmt.Errorf("Unable to parse video info data: %s", err.Error())
+			return nil, fmt.Errorf("Unable to parse video info data: %w", err)
 		}
 		args := make(map[string]interface{})
 		for k, v := range query {
@@ -247,7 +247,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 
 		if err := json.Unmarshal([]byte(playerResponseJSON), &playerResponse); err != nil {
-			return nil, fmt.Errorf("Couldn't parse player response: %s", err.Error())
+			return nil, fmt.Errorf("Couldn't parse player response: %w", err)
 		}
 
 		if playerResponse.PlayabilityStatus.Status != "OK" {
@@ -351,7 +351,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	if dashManifestURL, ok := inf["dashmpd"].(string); ok {
 		tokens, err := getSigTokens(info.htmlPlayerFile)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to extract signature tokens: %s", err.Error())
+			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
 		}
 		regex := regexp.MustCompile("\\/s\\/([a-fA-F0-9\\.]+)")
 		regexSub := regexp.MustCompile("([a-fA-F0-9\\.]+)")
@@ -360,7 +360,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		})
 		dashFormats, err := getDashManifest(dashManifestURL)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to extract dash manifest: %s", err.Error())
+			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
 		}
 
 		for _, dashFormat := range dashFormats {
