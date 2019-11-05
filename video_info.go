@@ -166,6 +166,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	re := regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
 	matches := re.FindSubmatch(html)
 	var jsonConfig map[string]interface{}
+
 	if len(matches) > 1 {
 		err = json.Unmarshal(matches[1], &jsonConfig)
 		if err != nil {
@@ -173,30 +174,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 	} else {
 		log.Debug("Unable to extract json from default url, trying embedded url")
-		var resp *http.Response
-		resp, err = http.Get(youtubeEmbededBaseURL + id)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			return nil, fmt.Errorf("Embeded url request returned status code %d	", resp.StatusCode)
-		}
-		html, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
-		re = regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
 
-		matches := re.FindSubmatch(html)
-		if len(matches) < 2 {
-			return nil, fmt.Errorf("Error extracting sts from embedded url response")
-		}
-		dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
-		err = dec.Decode(&jsonConfig)
+		jsonConfig, err = getVideoInfoFromEmbedded(id)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to extract json from embedded url: %w", err)
+			return nil, err
 		}
 
 		query := url.Values{
@@ -205,10 +186,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 
 		if sts, ok := jsonConfig["sts"].(float64); ok {
-			query["sts"] = []string{strconv.Itoa(int(sts))}
+			query.Add("sts", strconv.Itoa(int(sts)))
 		}
 
-		resp, err = http.Get(youtubeVideoInfoURL + "?" + query.Encode())
+		resp, err := http.Get(youtubeVideoInfoURL + "?" + query.Encode())
 		if err != nil {
 			return nil, fmt.Errorf("Error fetching video info: %w", err)
 		}
@@ -379,6 +360,38 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	}
 	info.Formats = formats
 	return info, nil
+}
+
+func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
+	var jsonConfig map[string]interface{}
+
+	resp, err := http.Get(youtubeEmbededBaseURL + id)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Embeded url request returned status code %d", resp.StatusCode)
+	}
+	html, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
+	re := regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
+
+	matches := re.FindSubmatch(html)
+	if len(matches) < 2 {
+		return nil, fmt.Errorf("Error extracting sts from embedded url response")
+	}
+	dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
+	err = dec.Decode(&jsonConfig)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to extract json from embedded url: %w", err)
+	}
+
+	return jsonConfig, nil
 }
 
 type representation struct {
