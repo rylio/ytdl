@@ -5,23 +5,19 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"runtime"
 	"strconv"
 	"time"
 
 	"encoding/json"
 
-	"github.com/cheggaaa/pb"
-	"github.com/codegangsta/cli"
-	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
+	"github.com/olekukonko/tablewriter"
 	"github.com/rylio/ytdl"
 	log "github.com/sirupsen/logrus"
-	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli"
 )
 
 type options struct {
-	noProgress     bool
 	outputFile     string
 	infoOnly       bool
 	silent         bool
@@ -57,12 +53,8 @@ func main() {
 			Usage: "Only output video info",
 		},
 		cli.BoolFlag{
-			Name:  "no-progress",
-			Usage: "Disable the progress bar",
-		},
-		cli.BoolFlag{
 			Name:  "silent, s",
-			Usage: "Only output errors, also disables progress bar",
+			Usage: "Only output errors",
 		},
 		cli.BoolFlag{
 			Name:  "debug, d",
@@ -104,18 +96,17 @@ func main() {
 			cli.ShowAppHelp(c)
 		} else {
 			options := options{
-				noProgress:  c.Bool("no-progress"),
-				outputFile:  c.String("output"),
-				infoOnly:    c.Bool("info"),
-				silent:      c.Bool("silent"),
-				debug:       c.Bool("debug"),
-				append:      c.Bool("append"),
-				filters:     c.StringSlice("filter"),
-				downloadURL: c.Bool("download-url"),
-				byteRange:   c.String("range"),
-				json:        c.Bool("json"),
-				startOffset: c.String("start-offset"),
-				downloadOption:      c.Bool("download-option"),
+				outputFile:     c.String("output"),
+				infoOnly:       c.Bool("info"),
+				silent:         c.Bool("silent"),
+				debug:          c.Bool("debug"),
+				append:         c.Bool("append"),
+				filters:        c.StringSlice("filter"),
+				downloadURL:    c.Bool("download-url"),
+				byteRange:      c.String("range"),
+				json:           c.Bool("json"),
+				startOffset:    c.String("start-offset"),
+				downloadOption: c.Bool("download-option"),
 			}
 			if len(options.filters) == 0 {
 				options.filters = cli.StringSlice{
@@ -144,10 +135,7 @@ func handler(identifier string, options options) {
 
 	var out io.Writer
 	var logOut io.Writer = os.Stdout
-	if runtime.GOOS == "windows" && isatty.IsTerminal(os.Stdout.Fd()) {
-		logOut = colorable.NewColorableStdout()
-		log.SetFormatter(&log.TextFormatter{ForceColors: true})
-	}
+
 	// if downloading to stdout, set log output to stderr, not sure if this is correct
 	if options.outputFile == "-" {
 		out = os.Stdout
@@ -323,18 +311,6 @@ func handler(identifier string, options options) {
 		return
 	}
 	defer resp.Body.Close()
-	// if we aren't in silent mode or the no progress flag wasn't set,
-	// initialize progress bar
-	if !silent && !options.noProgress {
-		progressBar := pb.New64(resp.ContentLength)
-		progressBar.SetUnits(pb.U_BYTES)
-		progressBar.ShowTimeLeft = true
-		progressBar.ShowSpeed = true
-		//	progressBar.RefreshRate = time.Millisecond * 1
-		progressBar.Output = logOut
-		progressBar.Start()
-		defer progressBar.Finish()
-		out = io.MultiWriter(out, progressBar)
-	}
+
 	_, err = io.Copy(out, resp.Body)
 }
