@@ -69,7 +69,6 @@ func main() {
   - Supported template variables are Title, Ext, DatePublished, Resolution
   - Pass - to output to stdout, former stdout output is redirected to stderr
 - `--info, -i` - Just gets video info, outputs to stdout
-- `--no-progress` - Disables the progress bar
 - `--silent, -s` - Disables all output, except for fatal errors
 - `--debug, -d` - Output debug logs
 - `--append, -a` - append to output file, instead of truncating
