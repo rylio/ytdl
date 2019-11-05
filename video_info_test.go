@@ -24,8 +24,6 @@ func TestVideoInfo(t *testing.T) {
 	}
 }
 
-
-
 func TestGetDownloadURL(t *testing.T) {
 	testCases := []string{
 		"https://www.youtube.com/watch?v=FrG4TEcSuRg",
