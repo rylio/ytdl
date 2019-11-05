@@ -48,7 +48,7 @@ func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	query := u.Query()
 	query.Set("ratebypass", "yes")
 	if len(sig) > 0 {
-		query.Set("signature", sig)
+		query.Set("sig", sig)
 	}
 	u.RawQuery = query.Encode()
 	return u, nil
