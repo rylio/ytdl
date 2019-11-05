@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -92,15 +91,8 @@ func GetVideoInfoFromID(id string) (*VideoInfo, error) {
 	values.Set("v", id)
 	u.RawQuery = values.Encode()
 
-	resp, err := http.Get(u.String())
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Invalid status code: %d", resp.StatusCode)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := httpGetAndCheckResponseReadBody(u.String())
+
 	if err != nil {
 		return nil, err
 	}
@@ -188,17 +180,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			query.Add("sts", strconv.Itoa(int(sts)))
 		}
 
-		resp, err := http.Get(youtubeVideoInfoURL + "?" + query.Encode())
+		body, err := httpGetAndCheckResponseReadBody(youtubeVideoInfoURL + "?" + query.Encode())
+
 		if err != nil {
-			return nil, fmt.Errorf("Error fetching video info: %w", err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			return nil, fmt.Errorf("Video info response invalid status code")
-		}
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to read video info response body: %w", err)
+			return nil, fmt.Errorf("Unable to read video info: %w", err)
 		}
 		query, err = url.ParseQuery(string(body))
 		if err != nil {
@@ -364,19 +349,12 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	var jsonConfig map[string]interface{}
 
-	resp, err := http.Get(youtubeEmbededBaseURL + id)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	html, err := httpGetAndCheckResponseReadBody(youtubeEmbededBaseURL + id)
 
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Embeded url request returned status code %d", resp.StatusCode)
-	}
-	html, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Embeded url request returned %w", err)
 	}
+
 	//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
 	re := regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
 
@@ -401,14 +379,12 @@ type representation struct {
 
 func getDashManifest(urlString string) (formats []Format, err error) {
 
-	resp, err := http.Get(urlString)
+	resp, err := httpGetAndCheckResponse(urlString)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Invalid status code %d", resp.StatusCode)
-	}
+
 	dec := xml.NewDecoder(resp.Body)
 	var token xml.Token
 	for ; err == nil; token, err = dec.Token() {

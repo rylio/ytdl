@@ -2,8 +2,6 @@ package ytdl
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -125,19 +123,12 @@ func getSigTokens(htmlPlayerFile string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Get(u.ResolveReference(p).String())
+
+	body, err := httpGetAndCheckResponseReadBody(u.ResolveReference(p).String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error fetching signature tokens: %w", err)
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Error fetching signature tokens, status code %d", resp.StatusCode)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
 	bodyString := string(body)
-	if err != nil {
-		return nil, err
-	}
 
 	objResult := actionsObjRegexp.FindStringSubmatch(bodyString)
 	funcResult := actionsFuncRegexp.FindStringSubmatch(bodyString)
