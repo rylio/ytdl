@@ -46,6 +46,20 @@ type VideoInfo struct {
 	htmlPlayerFile string
 }
 
+type playerResponse struct {
+	PlayabilityStatus struct {
+		Status string `json:"status"`
+		Reason string `json:"reason"`
+	} `json:"playabilityStatus"`
+	VideoDetails struct {
+		Title         string   `json:"title"`
+		Author        string   `json:"author"`
+		LengthSeconds string   `json:"lengthSeconds"`
+		Keywords      []string `json:"keywords"`
+		ViewCount     string   `json:"viewCount"`
+	} `json:"videoDetails"`
+}
+
 // GetVideoInfo fetches info from a url string, url object, or a url string
 func GetVideoInfo(value interface{}) (*VideoInfo, error) {
 	switch t := value.(type) {
@@ -204,38 +218,26 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	}
 
 	if playerResponseJSON, ok := inf["player_response"].(string); ok {
-		var playerResponse struct {
-			PlayabilityStatus struct {
-				Status string `json:"status"`
-				Reason string `json:"reason"`
-			} `json:"playabilityStatus"`
-		}
+		response := &playerResponse{}
 
-		if err := json.Unmarshal([]byte(playerResponseJSON), &playerResponse); err != nil {
+		if err := json.Unmarshal([]byte(playerResponseJSON), &response); err != nil {
 			return nil, fmt.Errorf("Couldn't parse player response: %w", err)
 		}
 
-		if playerResponse.PlayabilityStatus.Status != "OK" {
-			return nil, fmt.Errorf("Unavailable because: %s", playerResponse.PlayabilityStatus.Reason)
+		if response.PlayabilityStatus.Status != "OK" {
+			return nil, fmt.Errorf("Unavailable because: %s", response.PlayabilityStatus.Reason)
 		}
+
+		if seconds := response.VideoDetails.LengthSeconds; seconds != "" {
+			val, err := strconv.Atoi(seconds)
+			if err == nil {
+				info.Duration = time.Duration(val) * time.Second
+			}
+		}
+
+		info.Author = response.VideoDetails.Author
 	} else {
 		log.Debug().Msg("Unable to extract player response JSON")
-	}
-
-	if a, ok := inf["author"].(string); ok {
-		info.Author = a
-	} else {
-		log.Debug().Msg("Unable to extract author")
-	}
-
-	if length, ok := inf["length_seconds"].(string); ok {
-		if duration, err := strconv.ParseInt(length, 10, 64); err == nil {
-			info.Duration = time.Second * time.Duration(duration)
-		} else {
-			log.Debug().Msgf("Unable to parse duration string: %v", length)
-		}
-	} else {
-		log.Debug().Msg("Unable to extract duration")
 	}
 
 	// For the future maybe
