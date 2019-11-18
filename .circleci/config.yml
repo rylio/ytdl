@@ -1,0 +1,16 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+
+      - run: go test -v -cover -coverprofile=coverage.txt ./...
+      - run: bash <(curl -s https://codecov.io/bash)
+
+      - run: go build ./cmd/ytdl
+      - run: .circleci/check-gofmt
