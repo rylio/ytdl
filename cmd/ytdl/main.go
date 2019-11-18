@@ -10,11 +10,11 @@ import (
 
 	"encoding/json"
 
+	"github.com/corny/ytdl"
 	"github.com/mattn/go-isatty"
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/rylio/ytdl"
 	"github.com/urfave/cli"
 )
 
