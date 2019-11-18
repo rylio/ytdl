@@ -90,7 +90,7 @@ func (f Format) CompareKey(other Format, key FormatKey) int {
 
 // FORMATS is a map of all itags and their formats
 var FORMATS = map[int]Format{
-	5: Format{
+	5: {
 		Extension:     "flv",
 		Resolution:    "240p",
 		VideoEncoding: "Sorenson H.283",
@@ -98,7 +98,7 @@ var FORMATS = map[int]Format{
 		Itag:          5,
 		AudioBitrate:  64,
 	},
-	6: Format{
+	6: {
 		Extension:     "flv",
 		Resolution:    "270p",
 		VideoEncoding: "Sorenson H.263",
@@ -106,7 +106,7 @@ var FORMATS = map[int]Format{
 		Itag:          6,
 		AudioBitrate:  64,
 	},
-	13: Format{
+	13: {
 		Extension:     "3gp",
 		Resolution:    "",
 		VideoEncoding: "MPEG-4 Visual",
@@ -114,7 +114,7 @@ var FORMATS = map[int]Format{
 		Itag:          13,
 		AudioBitrate:  0,
 	},
-	17: Format{
+	17: {
 		Extension:     "3gp",
 		Resolution:    "144p",
 		VideoEncoding: "MPEG-4 Visual",
@@ -122,7 +122,7 @@ var FORMATS = map[int]Format{
 		Itag:          17,
 		AudioBitrate:  24,
 	},
-	18: Format{
+	18: {
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
@@ -130,7 +130,7 @@ var FORMATS = map[int]Format{
 		Itag:          18,
 		AudioBitrate:  96,
 	},
-	22: Format{
+	22: {
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -138,7 +138,7 @@ var FORMATS = map[int]Format{
 		Itag:          22,
 		AudioBitrate:  192,
 	},
-	34: Format{
+	34: {
 		Extension:     "flv",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
@@ -146,7 +146,7 @@ var FORMATS = map[int]Format{
 		Itag:          34,
 		AudioBitrate:  128,
 	},
-	35: Format{
+	35: {
 		Extension:     "flv",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
@@ -154,7 +154,7 @@ var FORMATS = map[int]Format{
 		Itag:          35,
 		AudioBitrate:  128,
 	},
-	36: Format{
+	36: {
 		Extension:     "3gp",
 		Resolution:    "240p",
 		VideoEncoding: "MPEG-4 Visual",
@@ -162,7 +162,7 @@ var FORMATS = map[int]Format{
 		Itag:          36,
 		AudioBitrate:  36,
 	},
-	37: Format{
+	37: {
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
@@ -170,7 +170,7 @@ var FORMATS = map[int]Format{
 		Itag:          37,
 		AudioBitrate:  192,
 	},
-	38: Format{
+	38: {
 		Extension:     "mp4",
 		Resolution:    "3072p",
 		VideoEncoding: "H.264",
@@ -178,7 +178,7 @@ var FORMATS = map[int]Format{
 		Itag:          38,
 		AudioBitrate:  192,
 	},
-	43: Format{
+	43: {
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
@@ -186,7 +186,7 @@ var FORMATS = map[int]Format{
 		Itag:          43,
 		AudioBitrate:  128,
 	},
-	44: Format{
+	44: {
 		Extension:     "webm",
 		Resolution:    "480p",
 		VideoEncoding: "VP8",
@@ -194,7 +194,7 @@ var FORMATS = map[int]Format{
 		Itag:          44,
 		AudioBitrate:  128,
 	},
-	45: Format{
+	45: {
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP8",
@@ -202,7 +202,7 @@ var FORMATS = map[int]Format{
 		Itag:          45,
 		AudioBitrate:  192,
 	},
-	46: Format{
+	46: {
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP8",
@@ -210,14 +210,14 @@ var FORMATS = map[int]Format{
 		Itag:          46,
 		AudioBitrate:  192,
 	},
-	82: Format{
+	82: {
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
 		Itag:          82,
 		AudioBitrate:  96,
 	},
-	83: Format{
+	83: {
 		Extension:     "mp4",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
@@ -225,7 +225,7 @@ var FORMATS = map[int]Format{
 		Itag:          83,
 		AudioBitrate:  96,
 	},
-	84: Format{
+	84: {
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -233,7 +233,7 @@ var FORMATS = map[int]Format{
 		Itag:          84,
 		AudioBitrate:  192,
 	},
-	85: Format{
+	85: {
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
@@ -241,7 +241,7 @@ var FORMATS = map[int]Format{
 		Itag:          85,
 		AudioBitrate:  192,
 	},
-	100: Format{
+	100: {
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
@@ -249,7 +249,7 @@ var FORMATS = map[int]Format{
 		Itag:          100,
 		AudioBitrate:  128,
 	},
-	101: Format{
+	101: {
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
@@ -257,7 +257,7 @@ var FORMATS = map[int]Format{
 		Itag:          101,
 		AudioBitrate:  192,
 	},
-	102: Format{
+	102: {
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP8",
@@ -266,7 +266,7 @@ var FORMATS = map[int]Format{
 		AudioBitrate:  192,
 	},
 	// DASH (video only)
-	133: Format{
+	133: {
 		Extension:     "mp4",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
@@ -274,7 +274,7 @@ var FORMATS = map[int]Format{
 		Itag:          133,
 		AudioBitrate:  0,
 	},
-	134: Format{
+	134: {
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
@@ -282,7 +282,7 @@ var FORMATS = map[int]Format{
 		Itag:          134,
 		AudioBitrate:  0,
 	},
-	135: Format{
+	135: {
 		Extension:     "mp4",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
@@ -290,7 +290,7 @@ var FORMATS = map[int]Format{
 		Itag:          135,
 		AudioBitrate:  0,
 	},
-	136: Format{
+	136: {
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -298,7 +298,7 @@ var FORMATS = map[int]Format{
 		Itag:          136,
 		AudioBitrate:  0,
 	},
-	137: Format{
+	137: {
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
@@ -306,7 +306,7 @@ var FORMATS = map[int]Format{
 		Itag:          137,
 		AudioBitrate:  0,
 	},
-	138: Format{
+	138: {
 		Extension:     "mp4",
 		Resolution:    "2160p",
 		VideoEncoding: "H.264",
@@ -314,7 +314,7 @@ var FORMATS = map[int]Format{
 		Itag:          138,
 		AudioBitrate:  0,
 	},
-	160: Format{
+	160: {
 		Extension:     "mp4",
 		Resolution:    "144p",
 		VideoEncoding: "H.264",
@@ -322,7 +322,7 @@ var FORMATS = map[int]Format{
 		Itag:          160,
 		AudioBitrate:  0,
 	},
-	242: Format{
+	242: {
 		Extension:     "webm",
 		Resolution:    "240p",
 		VideoEncoding: "VP9",
@@ -330,7 +330,7 @@ var FORMATS = map[int]Format{
 		Itag:          242,
 		AudioBitrate:  0,
 	},
-	243: Format{
+	243: {
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP9",
@@ -338,7 +338,7 @@ var FORMATS = map[int]Format{
 		Itag:          243,
 		AudioBitrate:  0,
 	},
-	244: Format{
+	244: {
 		Extension:     "webm",
 		Resolution:    "480p",
 		VideoEncoding: "VP9",
@@ -346,7 +346,7 @@ var FORMATS = map[int]Format{
 		Itag:          244,
 		AudioBitrate:  0,
 	},
-	247: Format{
+	247: {
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP9",
@@ -354,7 +354,7 @@ var FORMATS = map[int]Format{
 		Itag:          247,
 		AudioBitrate:  0,
 	},
-	248: Format{
+	248: {
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP9",
@@ -362,7 +362,7 @@ var FORMATS = map[int]Format{
 		Itag:          248,
 		AudioBitrate:  9,
 	},
-	264: Format{
+	264: {
 		Extension:     "mp4",
 		Resolution:    "1440p",
 		VideoEncoding: "H.264",
@@ -370,7 +370,7 @@ var FORMATS = map[int]Format{
 		Itag:          264,
 		AudioBitrate:  0,
 	},
-	266: Format{
+	266: {
 		Extension:     "mp4",
 		Resolution:    "2160p",
 		VideoEncoding: "H.264",
@@ -378,7 +378,7 @@ var FORMATS = map[int]Format{
 		Itag:          266,
 		AudioBitrate:  0,
 	},
-	271: Format{
+	271: {
 		Extension:     "webm",
 		Resolution:    "1440p",
 		VideoEncoding: "VP9",
@@ -386,7 +386,7 @@ var FORMATS = map[int]Format{
 		Itag:          271,
 		AudioBitrate:  0,
 	},
-	272: Format{
+	272: {
 		Extension:     "webm",
 		Resolution:    "2160p",
 		VideoEncoding: "VP9",
@@ -394,7 +394,7 @@ var FORMATS = map[int]Format{
 		Itag:          272,
 		AudioBitrate:  0,
 	},
-	278: Format{
+	278: {
 		Extension:     "webm",
 		Resolution:    "144p",
 		VideoEncoding: "VP9",
@@ -402,7 +402,7 @@ var FORMATS = map[int]Format{
 		Itag:          278,
 		AudioBitrate:  0,
 	},
-	298: Format{
+	298: {
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -410,7 +410,7 @@ var FORMATS = map[int]Format{
 		Itag:          298,
 		AudioBitrate:  0,
 	},
-	299: Format{
+	299: {
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
@@ -418,7 +418,7 @@ var FORMATS = map[int]Format{
 		Itag:          299,
 		AudioBitrate:  0,
 	},
-	302: Format{
+	302: {
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP9",
@@ -426,7 +426,7 @@ var FORMATS = map[int]Format{
 		Itag:          302,
 		AudioBitrate:  0,
 	},
-	303: Format{
+	303: {
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP9",
@@ -435,7 +435,7 @@ var FORMATS = map[int]Format{
 		AudioBitrate:  0,
 	},
 	// DASH (audio only)
-	139: Format{
+	139: {
 		Extension:     "mp4",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -443,7 +443,7 @@ var FORMATS = map[int]Format{
 		Itag:          139,
 		AudioBitrate:  48,
 	},
-	140: Format{
+	140: {
 		Extension:     "mp4",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -451,7 +451,7 @@ var FORMATS = map[int]Format{
 		Itag:          140,
 		AudioBitrate:  128,
 	},
-	141: Format{
+	141: {
 		Extension:     "mp4",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -459,7 +459,7 @@ var FORMATS = map[int]Format{
 		Itag:          141,
 		AudioBitrate:  256,
 	},
-	171: Format{
+	171: {
 		Extension:     "webm",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -467,7 +467,7 @@ var FORMATS = map[int]Format{
 		Itag:          171,
 		AudioBitrate:  128,
 	},
-	172: Format{
+	172: {
 		Extension:     "webm",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -475,7 +475,7 @@ var FORMATS = map[int]Format{
 		Itag:          172,
 		AudioBitrate:  192,
 	},
-	249: Format{
+	249: {
 		Extension:     "webm",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -483,7 +483,7 @@ var FORMATS = map[int]Format{
 		Itag:          249,
 		AudioBitrate:  50,
 	},
-	250: Format{
+	250: {
 		Extension:     "webm",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -491,7 +491,7 @@ var FORMATS = map[int]Format{
 		Itag:          250,
 		AudioBitrate:  70,
 	},
-	251: Format{
+	251: {
 		Extension:     "webm",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -500,7 +500,7 @@ var FORMATS = map[int]Format{
 		AudioBitrate:  160,
 	},
 	// Live streaming
-	92: Format{
+	92: {
 		Extension:     "ts",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
@@ -508,7 +508,7 @@ var FORMATS = map[int]Format{
 		Itag:          92,
 		AudioBitrate:  48,
 	},
-	93: Format{
+	93: {
 		Extension:     "ts",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
@@ -516,7 +516,7 @@ var FORMATS = map[int]Format{
 		Itag:          93,
 		AudioBitrate:  128,
 	},
-	94: Format{
+	94: {
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -524,7 +524,7 @@ var FORMATS = map[int]Format{
 		Itag:          94,
 		AudioBitrate:  128,
 	},
-	95: Format{
+	95: {
 		Extension:     "ts",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
@@ -532,7 +532,7 @@ var FORMATS = map[int]Format{
 		Itag:          95,
 		AudioBitrate:  256,
 	},
-	96: Format{
+	96: {
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -540,7 +540,7 @@ var FORMATS = map[int]Format{
 		Itag:          96,
 		AudioBitrate:  256,
 	},
-	120: Format{
+	120: {
 		Extension:     "flv",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
@@ -548,7 +548,7 @@ var FORMATS = map[int]Format{
 		Itag:          120,
 		AudioBitrate:  128,
 	},
-	127: Format{
+	127: {
 		Extension:     "ts",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -556,7 +556,7 @@ var FORMATS = map[int]Format{
 		Itag:          127,
 		AudioBitrate:  96,
 	},
-	128: Format{
+	128: {
 		Extension:     "ts",
 		Resolution:    "",
 		VideoEncoding: "",
@@ -564,7 +564,7 @@ var FORMATS = map[int]Format{
 		Itag:          128,
 		AudioBitrate:  96,
 	},
-	132: Format{
+	132: {
 		Extension:     "ts",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
@@ -572,7 +572,7 @@ var FORMATS = map[int]Format{
 		Itag:          132,
 		AudioBitrate:  48,
 	},
-	151: Format{
+	151: {
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
