@@ -22,37 +22,37 @@ type formatListTestCase struct {
 
 func TestFilter(t *testing.T) {
 	cases := []formatListTestCase{
-		formatListTestCase{
+		{
 			FormatExtensionKey,
 			[]interface{}{"mp4"},
 			FormatList{formats[0], formats[1], formats[3], formats[4], formats[5]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			[]interface{}{"360p", "720p"},
 			FormatList{formats[0], formats[1]},
 		},
-		formatListTestCase{
+		{
 			FormatItagKey,
 			[]interface{}{"22", "37"},
 			FormatList{formats[1], formats[3]},
 		},
-		formatListTestCase{
+		{
 			FormatAudioBitrateKey,
 			[]interface{}{"96", "128"},
 			FormatList{formats[0], formats[2]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			[]interface{}{""},
 			FormatList{formats[5]},
 		},
-		formatListTestCase{
+		{
 			FormatAudioBitrateKey,
 			[]interface{}{"0"},
 			FormatList{formats[4]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			[]interface{}{},
 			nil,
@@ -70,27 +70,27 @@ func TestFilter(t *testing.T) {
 func TestExtremes(t *testing.T) {
 
 	cases := []formatListTestCase{
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			true,
 			FormatList{formats[3]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			false,
 			FormatList{formats[5]},
 		},
-		formatListTestCase{
+		{
 			FormatAudioBitrateKey,
 			true,
 			FormatList{formats[1], formats[3]},
 		},
-		formatListTestCase{
+		{
 			FormatAudioBitrateKey,
 			false,
 			FormatList{formats[4]},
 		},
-		formatListTestCase{
+		{
 			FormatItagKey,
 			true,
 			formats,
@@ -106,17 +106,17 @@ func TestExtremes(t *testing.T) {
 
 func TestSubtract(t *testing.T) {
 	cases := []formatListTestCase{
-		formatListTestCase{
+		{
 			FormatExtensionKey,
 			[]interface{}{"mp4"},
 			FormatList{formats[2]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			[]interface{}{"480p", "360p", "240p", ""},
 			FormatList{formats[1], formats[3]},
 		},
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			[]interface{}{},
 			formats,
@@ -132,7 +132,7 @@ func TestSubtract(t *testing.T) {
 
 func TestSort(t *testing.T) {
 	cases := []formatListTestCase{
-		formatListTestCase{
+		{
 			FormatResolutionKey,
 			formats,
 			FormatList{
@@ -144,7 +144,7 @@ func TestSort(t *testing.T) {
 				formats[3],
 			},
 		},
-		formatListTestCase{
+		{
 			FormatAudioBitrateKey,
 			formats,
 			FormatList{
