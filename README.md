@@ -1,8 +1,8 @@
-# ytdl [![Build Status](https://travis-ci.org/rylio/ytdl.svg)](https://travis-ci.org/rylio/ytdl) [![GoDoc](https://godoc.org/github.com/rylio/ytdl?status.svg)](https://godoc.org/github.com/rylio/ytdl)
+# ytdl [![Build Status](https://travis-ci.org/corny/ytdl.svg)](https://travis-ci.org/corny/ytdl) [![GoDoc](https://godoc.org/github.com/corny/ytdl?status.svg)](https://godoc.org/github.com/corny/ytdl)
 
 Go library for downloading YouTube videos
 
-[Documentation: https://godoc.org/github.com/rylio/ytdl](https://godoc.org/github.com/rylio/ytdl "ytdl")
+[Documentation: https://godoc.org/github.com/corny/ytdl](https://godoc.org/github.com/corny/ytdl "ytdl")
 
 ## Example
 
@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rylio/ytdl"
+	"github.com/corny/ytdl"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 
 ## ytdl CLI
 
-- To install: `go get -u github.com/rylio/ytdl/...`
+- To install: `go get -u github.com/corny/ytdl/...`
 
 - Or use Docker image `docker pull brucewangno1/ytdl:1.0`
 
@@ -48,7 +48,7 @@ func main() {
     - Shortcuts for best/worst(e.g. `-f best`)
       - `best`/`worst` - best/worst video and audio
       - `best-video`/`worst-video` - best/worst video
-      - `best-fps`/`worst-fps` - best/worst video with fps as the first priority      
+      - `best-fps`/`worst-fps` - best/worst video with fps as the first priority
       - `best-audio`/`worst-audio` - best/worst audio
   - To exclude:  -f !key:value1,...
   - Available keys (See format.go for available values):
