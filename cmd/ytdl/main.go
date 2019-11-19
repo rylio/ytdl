@@ -167,7 +167,9 @@ func handler(identifier string, options options) {
 
 	if options.infoOnly {
 		fmt.Println("Title:", info.Title)
-		fmt.Println("Author:", info.Author)
+		fmt.Println("Uploader:", info.Uploader)
+		fmt.Println("Artist:", info.Artist)
+		fmt.Println("Song:", info.Song)
 		fmt.Println("Date Published:", info.DatePublished.Format("Jan 2 2006"))
 		fmt.Println("Duration:", info.Duration)
 		return
@@ -261,7 +263,6 @@ func handler(identifier string, options options) {
 			Ext:           sanitizeFileNamePart(format.Extension),
 			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
 			Resolution:    sanitizeFileNamePart(format.Resolution),
-			Author:        sanitizeFileNamePart(info.Author),
 			Duration:      sanitizeFileNamePart(info.Duration.String()),
 		})
 		if err != nil {

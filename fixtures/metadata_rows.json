@@ -1,0 +1,218 @@
+{
+  "contents": {
+    "twoColumnWatchNextResults": {
+      "results": {
+        "results": {
+          "contents": [
+            {},
+            {
+              "videoSecondaryInfoRenderer": {
+                "metadataRowContainer": {
+                  "metadataRowContainerRenderer": {
+                    "rows": [
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Notice"
+                          },
+                          "contents": [
+                            {
+                              "runs": [
+                                {
+                                  "text": "Age-restricted video (based on Community Guidelines)",
+                                  "navigationEndpoint": {
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "url": "http:\/\/www.youtube.com\/t\/community_guidelines",
+                                        "rootVe": 83769
+                                      }
+                                    },
+                                    "urlEndpoint": {
+                                      "url": "http:\/\/www.youtube.com\/t\/community_guidelines"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Category"
+                          },
+                          "contents": [
+                            {
+                              "runs": [
+                                {
+                                  "text": "Music",
+                                  "navigationEndpoint": {
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "url": "\/channel\/UC-9-kyTW8ZkZNDHQJ6FgpwQ",
+                                        "webPageType": "WEB_PAGE_TYPE_BROWSE",
+                                        "rootVe": 3611
+                                      }
+                                    },
+                                    "browseEndpoint": {
+                                      "browseId": "UC-9-kyTW8ZkZNDHQJ6FgpwQ"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "metadataRowHeaderRenderer": {
+                          "content": {
+                            "simpleText": "Music in this video"
+                          },
+                          "hasDividerLine": true
+                        }
+                      },
+                      {
+                        "metadataRowHeaderRenderer": {
+                          "content": {
+                            "runs": [
+                              {
+                                "text": "Learn more",
+                                "navigationEndpoint": {
+                                  "commandMetadata": {
+                                    "webCommandMetadata": {
+                                      "url": "https:\/\/support.google.com\/youtube\/answer\/7680188",
+                                      "rootVe": 83769
+                                    }
+                                  },
+                                  "urlEndpoint": {
+                                    "url": "https:\/\/support.google.com\/youtube\/answer\/7680188",
+                                    "target": "TARGET_NEW_WINDOW"
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "hasDividerLine": false
+                        }
+                      },
+                      {
+                        "metadataRowHeaderRenderer": {
+                          "content": {
+                            "runs": [
+                              {
+                                "text": "Listen ad-free with YouTube Premium",
+                                "navigationEndpoint": {
+                                  "commandMetadata": {
+                                    "webCommandMetadata": {
+                                      "url": "\/premium",
+                                      "webPageType": "WEB_PAGE_TYPE_BROWSE",
+                                      "rootVe": 11487
+                                    }
+                                  },
+                                  "browseEndpoint": {
+                                    "browseId": "SPunlimited"
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "hasDividerLine": false
+                        }
+                      },
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Song"
+                          },
+                          "contents": [
+                            {
+                              "simpleText": "Tunnel Vision"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Artist"
+                          },
+                          "contents": [
+                            {
+                              "runs": [
+                                {
+                                  "text": "Justin Timberlake",
+                                  "navigationEndpoint": {
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "url": "\/channel\/UC-y8ci7xfsu4L3zkSuHae0A",
+                                        "webPageType": "WEB_PAGE_TYPE_BROWSE",
+                                        "rootVe": 3611
+                                      }
+                                    },
+                                    "browseEndpoint": {
+                                      "browseId": "UC-y8ci7xfsu4L3zkSuHae0A",
+                                      "canonicalBaseUrl": "\/channel\/UC-y8ci7xfsu4L3zkSuHae0A"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Writers"
+                          },
+                          "contents": [
+                            {
+                              "simpleText": "Justin Timberlake, Garland Mosley, James Fauntleroy, Jerome \"Jroc\" Harmon, Chris Godbey, Timbaland"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "metadataRowRenderer": {
+                          "title": {
+                            "simpleText": "Licensed to YouTube by"
+                          },
+                          "contents": [
+                            {
+                              "simpleText": "SME (on behalf of RCA Records Label); PEDL, Anthem Entertainment (Publishing), AMRA, CMRRA, Sony ATV Publishing, LatinAutor - UMPG, UMPG Publishing, LatinAutor - SonyATV, UNIAO BRASILEIRA DE EDITORAS DE MUSICA - UBEM, LatinAutor - Warner Chappell, UMPI, BMI - Broadcast Music Inc., Warner Chappell, LatinAutor, ASCAP, and 15 Music Rights Societies"
+                            }
+                          ],
+                          "hasDividerLine": false
+                        }
+                      }
+                    ],
+                    "collapsedItemCount": 1
+                  }
+                },
+                "showMoreText": {
+                  "runs": [
+                    {
+                      "text": "Show more"
+                    }
+                  ]
+                },
+                "showLessText": {
+                  "runs": [
+                    {
+                      "text": "Show less"
+                    }
+                  ]
+                },
+                "defaultExpanded": false,
+                "descriptionCollapsedLines": 3
+              }
+            },
+            {}
+          ]
+        }
+      }
+    }
+  }
+}
