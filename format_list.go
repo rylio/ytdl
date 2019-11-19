@@ -1,6 +1,15 @@
 package ytdl
 
-import "sort"
+import (
+	"bufio"
+	"io"
+	"net/url"
+	"sort"
+	"strconv"
+	"strings"
+
+	"github.com/rs/zerolog/log"
+)
 
 // FormatList is a slice of formats with filtering functionality
 type FormatList []Format
@@ -73,6 +82,49 @@ func (formats FormatList) Copy() FormatList {
 	dst := make(FormatList, len(formats))
 	copy(dst, formats)
 	return dst
+}
+
+func (formats *FormatList) parseFormats(rd io.Reader) {
+	r := bufio.NewReader(rd)
+
+	for {
+		line, err := r.ReadString(',')
+
+		if err == io.EOF {
+			break
+		}
+
+		formats.parseFormat(line[:len(line)-1])
+	}
+}
+
+func (formats *FormatList) parseFormat(input string) {
+	query, err := url.ParseQuery(input)
+	if err != nil {
+		log.Debug().Msgf("Unable to parse format as query: %v", query)
+		return
+	}
+
+	itag, _ := strconv.Atoi(query.Get("itag"))
+	format, ok := newFormat(itag)
+
+	if !ok {
+		log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
+		return
+	}
+
+	if strings.HasPrefix(query.Get("conn"), "rtmp") {
+		format.meta["rtmp"] = true
+	}
+	for k, v := range query {
+		if len(v) == 1 {
+			format.meta[k] = v[0]
+		} else {
+			format.meta[k] = v
+		}
+	}
+
+	*formats = append(*formats, format)
 }
 
 type formatsSortWrapper struct {

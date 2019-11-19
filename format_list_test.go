@@ -1,8 +1,13 @@
 package ytdl
 
 import (
+	"os"
 	"reflect"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var formats = FormatList{
@@ -171,4 +176,36 @@ func TestCopy(t *testing.T) {
 	if !reflect.DeepEqual(formats, formats.Copy()) {
 		t.Error("Copying format list failed")
 	}
+}
+
+func TestParseStreamList(t *testing.T) {
+	require := require.New(t)
+	assert := assert.New(t)
+
+	file, err := os.Open("fixtures/stream_map.txt")
+	require.NoError(err)
+	defer file.Close()
+
+	formats := FormatList{}
+	formats.parseFormats(file)
+
+	require.Len(formats, 2)
+	format := formats[0]
+	assert.Equal(22, format.Itag)
+	assert.Equal("mp4", format.Extension)
+	assert.Equal("720p", format.Resolution)
+	assert.Equal("H.264", format.VideoEncoding)
+	assert.Equal("aac", format.AudioEncoding)
+	assert.Equal(192, format.AudioBitrate)
+
+	meta := format.meta
+	assert.Len(meta, 4)
+	assert.Equal(`video/mp4; codecs="avc1.64001F, mp4a.40.2"`, meta["type"])
+	assert.Len(meta["url"], 769)
+}
+
+func TestParseStreamListEmpty(t *testing.T) {
+	formats := FormatList{}
+	formats.parseFormats(strings.NewReader(""))
+	assert.Len(t, formats, 0)
 }

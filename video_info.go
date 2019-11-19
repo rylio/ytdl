@@ -180,10 +180,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 
 		body, err := httpGetAndCheckResponseReadBody(youtubeVideoInfoURL + "?" + query.Encode())
-
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read video info: %w", err)
 		}
+
 		query, err = url.ParseQuery(string(body))
 		if err != nil {
 			return nil, fmt.Errorf("Unable to parse video info data: %w", err)
@@ -248,38 +248,12 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 	info.htmlPlayerFile = jsonConfig.Assets.JS
 
-	var formatStrings []string
-	if fmtStreamMap := inf.URLEncodedFmtStreamMap; fmtStreamMap != "" {
-		formatStrings = append(formatStrings, strings.Split(fmtStreamMap, ",")...)
-	}
-
-	if adaptiveFormats := inf.AdaptiveFmts; adaptiveFormats != "" {
-		formatStrings = append(formatStrings, strings.Split(adaptiveFormats, ",")...)
-	}
-
 	var formats FormatList
-	for _, v := range formatStrings {
-		query, err := url.ParseQuery(v)
-		if err == nil {
-			itag, _ := strconv.Atoi(query.Get("itag"))
-			if format, ok := newFormat(itag); ok {
-				if strings.HasPrefix(query.Get("conn"), "rtmp") {
-					format.meta["rtmp"] = true
-				}
-				for k, v := range query {
-					if len(v) == 1 {
-						format.meta[k] = v[0]
-					} else {
-						format.meta[k] = v
-					}
-				}
-				formats = append(formats, format)
-			} else {
-				log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
-			}
-		} else {
-			log.Debug().Msgf("Unable to format string %v", err)
-		}
+	formats.parseFormats(strings.NewReader(inf.URLEncodedFmtStreamMap))
+	formats.parseFormats(strings.NewReader(inf.AdaptiveFmts))
+
+	if len(formats) == 0 {
+		log.Debug().Msgf("No formats found")
 	}
 
 	if dashManifestURL := inf.Dashmpd; dashManifestURL != "" {
