@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/rs/zerolog/log"
 )
 
@@ -26,38 +25,18 @@ const youtubeDateFormat = "2006-01-02"
 
 // VideoInfo contains the info a youtube video
 type VideoInfo struct {
-	// The video ID
-	ID string `json:"id"`
-	// The video title
-	Title string `json:"title"`
-	// The video description
-	Description string `json:"description"`
-	// The date the video was published
-	DatePublished time.Time `json:"datePublished"`
-	// Formats the video is available in
-	Formats FormatList `json:"formats"`
-	// List of keywords associated with the video
-	Keywords []string `json:"keywords"`
-	// Author of the video
-	Author string `json:"author"`
-	// Duration of the video
-	Duration time.Duration
-
+	ID             string     // The video ID
+	Title          string     // The video title
+	Description    string     // The video description
+	DatePublished  time.Time  // The date the video was published
+	Formats        FormatList // Formats the video is available in
+	Keywords       []string   // List of keywords associated with the video
+	Uploader       string     // Author of the video
+	Song           string
+	Artist         string
+	Writers        string
+	Duration       time.Duration // Duration of the video
 	htmlPlayerFile string
-}
-
-type playerResponse struct {
-	PlayabilityStatus struct {
-		Status string `json:"status"`
-		Reason string `json:"reason"`
-	} `json:"playabilityStatus"`
-	VideoDetails struct {
-		Title         string   `json:"title"`
-		Author        string   `json:"author"`
-		LengthSeconds string   `json:"lengthSeconds"`
-		Keywords      []string `json:"keywords"`
-		ViewCount     string   `json:"viewCount"`
-	} `json:"videoDetails"`
 }
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
@@ -144,44 +123,50 @@ func (info *VideoInfo) Download(format Format, dest io.Writer) error {
 	return err
 }
 
+var (
+	regexpPlayerConfig          = regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
+	regexpInitialData           = regexp.MustCompile(`\["ytInitialData"\] = (.+);`)
+	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
+)
+
 func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(html))
-	if err != nil {
-		return nil, err
-	}
 
 	info := &VideoInfo{}
 
-	// extract description and title
-	info.Description = strings.TrimSpace(doc.Find("#eow-description").Text())
-	info.Title = strings.TrimSpace(doc.Find("#eow-title").Text())
-	info.ID = id
-	dateStr, ok := doc.Find("meta[itemprop=\"datePublished\"]").Attr("content")
-	if !ok {
-		log.Debug().Msg("Unable to extract date published")
-	} else {
-		date, err := time.Parse(youtubeDateFormat, dateStr)
-		if err == nil {
-			info.DatePublished = date
-		} else {
-			log.Debug().Msgf("Unable to parse date published %v", err)
+	if matches := regexpInitialData.FindSubmatch(html); len(matches) > 0 {
+		data := initialData{}
+
+		if err := json.Unmarshal(matches[1], &data); err != nil {
+			return nil, err
+		}
+
+		contents := data.Contents.TwoColumnWatchNextResults.Results.Results.Contents
+
+		if len(contents) >= 2 {
+			info.Description = contents[1].VideoSecondaryInfoRenderer.Description.String()
+			rows := contents[1].VideoSecondaryInfoRenderer.MetadataRowContainer.MetadataRowContainerRenderer.Rows
+
+			info.Artist = rows.Get("Artist")
+			info.Song = rows.Get("Song")
+			info.Writers = rows.Get("Writers")
 		}
 	}
 
-	// match json in javascript
-	re := regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
-	matches := re.FindSubmatch(html)
-	var jsonConfig map[string]interface{}
+	info.ID = id
 
-	if len(matches) > 1 {
-		err = json.Unmarshal(matches[1], &jsonConfig)
+	var jsonConfig playerConfig
+
+	// match json in javascript
+	if matches := regexpPlayerConfig.FindSubmatch(html); len(matches) > 1 {
+
+		err := json.Unmarshal(matches[1], &jsonConfig)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
-		jsonConfig, err = getVideoInfoFromEmbedded(id)
+		info, err := getVideoInfoFromEmbedded(id)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +175,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			"eurl":     []string{youtubeVideoEURL + id},
 		}
 
-		if sts, ok := jsonConfig["sts"].(float64); ok {
+		if sts, ok := info["sts"].(float64); ok {
 			query.Add("sts", strconv.Itoa(int(sts)))
 		}
 
@@ -203,24 +188,38 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Unable to parse video info data: %w", err)
 		}
-		args := make(map[string]interface{})
+
 		for k, v := range query {
-			if len(v) > 0 {
-				args[k] = v[0]
+			switch k {
+			case "errorcode":
+				jsonConfig.Args.Errorcode = v[0]
+			case "reason":
+				jsonConfig.Args.Reason = v[0]
+			case "status":
+				jsonConfig.Args.Status = v[0]
+			case "player_response":
+				jsonConfig.Args.PlayerResponse = v[0]
+			case "url_encoded_fmt_stream_map":
+				jsonConfig.Args.URLEncodedFmtStreamMap = v[0]
+			case "adaptive_fmts":
+				jsonConfig.Args.AdaptiveFmts = v[0]
+			case "dashmpd":
+				jsonConfig.Args.Dashmpd = v[0]
+			default:
+				// log.Debug().Msgf("unknown query param: %v", k)
 			}
 		}
-		jsonConfig["args"] = args
 	}
 
-	inf := jsonConfig["args"].(map[string]interface{})
-	if status, ok := inf["status"].(string); ok && status == "fail" {
-		return nil, fmt.Errorf("Error %d:%s", inf["errorcode"], inf["reason"])
+	inf := jsonConfig.Args
+	if inf.Status == "fail" {
+		return nil, fmt.Errorf("Error %s:%s", inf.Errorcode, inf.Reason)
 	}
 
-	if playerResponseJSON, ok := inf["player_response"].(string); ok {
+	if inf.PlayerResponse != "" {
 		response := &playerResponse{}
 
-		if err := json.Unmarshal([]byte(playerResponseJSON), &response); err != nil {
+		if err := json.Unmarshal([]byte(inf.PlayerResponse), &response); err != nil {
 			return nil, fmt.Errorf("Couldn't parse player response: %w", err)
 		}
 
@@ -235,61 +234,29 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			}
 		}
 
-		info.Author = response.VideoDetails.Author
+		if date, err := time.Parse(youtubeDateFormat, response.Microformat.Renderer.PublishDate); err == nil {
+			info.DatePublished = date
+		} else {
+			log.Debug().Msgf("Unable to parse date published %v", err)
+		}
+
+		info.Title = response.VideoDetails.Title
+		info.Uploader = response.VideoDetails.Author
 	} else {
 		log.Debug().Msg("Unable to extract player response JSON")
 	}
 
-	// For the future maybe
-	parseKey := func(key string) []string {
-		val, ok := inf[key].(string)
-		if !ok {
-			return nil
-		}
-		vals := []string{}
-		split := strings.Split(val, ",")
-		for _, v := range split {
-			if v != "" {
-				vals = append(vals, v)
-			}
-		}
-		return vals
-	}
-	info.Keywords = parseKey("keywords")
-	info.htmlPlayerFile = jsonConfig["assets"].(map[string]interface{})["js"].(string)
+	info.htmlPlayerFile = jsonConfig.Assets.JS
 
-	/*
-		fmtList := parseKey("fmt_list")
-		fexp := parseKey("fexp")
-		watermark := parseKey("watermark")
-
-		if len(fmtList) != 0 {
-			vals := []string{}
-			for _, v := range fmtList {
-				vals = append(vals, strings.Split(v, "/")...)
-		} else {
-			info["fmt_list"] = []string{}
-		}
-
-		videoVerticals := []string{}
-		if videoVertsStr, ok := inf["video_verticals"].(string); ok {
-			videoVertsStr = string([]byte(videoVertsStr)[1 : len(videoVertsStr)-2])
-			videoVertsSplit := strings.Split(videoVertsStr, ", ")
-			for _, v := range videoVertsSplit {
-				if v != "" {
-					videoVerticals = append(videoVerticals, v)
-				}
-			}
-		}
-	*/
 	var formatStrings []string
-	if fmtStreamMap, ok := inf["url_encoded_fmt_stream_map"].(string); ok {
+	if fmtStreamMap := inf.URLEncodedFmtStreamMap; fmtStreamMap != "" {
 		formatStrings = append(formatStrings, strings.Split(fmtStreamMap, ",")...)
 	}
 
-	if adaptiveFormats, ok := inf["adaptive_fmts"].(string); ok {
+	if adaptiveFormats := inf.AdaptiveFmts; adaptiveFormats != "" {
 		formatStrings = append(formatStrings, strings.Split(adaptiveFormats, ",")...)
 	}
+
 	var formats FormatList
 	for _, v := range formatStrings {
 		query, err := url.ParseQuery(v)
@@ -315,7 +282,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 	}
 
-	if dashManifestURL, ok := inf["dashmpd"].(string); ok {
+	if dashManifestURL := inf.Dashmpd; dashManifestURL != "" {
 		tokens, err := getSigTokens(info.htmlPlayerFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
@@ -345,6 +312,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		}
 	}
 	info.Formats = formats
+
 	return info, nil
 }
 
@@ -371,12 +339,6 @@ func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	}
 
 	return jsonConfig, nil
-}
-
-type representation struct {
-	Itag   int    `xml:"id,attr"`
-	Height int    `xml:"height,attr"`
-	URL    string `xml:"BaseURL"`
 }
 
 func getDashManifest(urlString string) (formats []Format, err error) {
