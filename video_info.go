@@ -34,6 +34,7 @@ type VideoInfo struct {
 	Uploader       string     // Author of the video
 	Song           string
 	Artist         string
+	Album          string
 	Writers        string
 	Duration       time.Duration // Duration of the video
 	htmlPlayerFile string
@@ -143,10 +144,13 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		contents := data.Contents.TwoColumnWatchNextResults.Results.Results.Contents
 
 		if len(contents) >= 2 {
-			info.Description = contents[1].VideoSecondaryInfoRenderer.Description.String()
-			rows := contents[1].VideoSecondaryInfoRenderer.MetadataRowContainer.MetadataRowContainerRenderer.Rows
+			infoRenderer := contents[1].VideoSecondaryInfoRenderer
+
+			info.Description = infoRenderer.Description.String()
+			rows := infoRenderer.MetadataRowContainer.MetadataRowContainerRenderer.Rows
 
 			info.Artist = rows.Get("Artist")
+			info.Album = rows.Get("Album")
 			info.Song = rows.Get("Song")
 			info.Writers = rows.Get("Writers")
 		}
