@@ -107,7 +107,6 @@ func (formats *FormatList) parseFormat(input string) {
 
 	itag, _ := strconv.Atoi(query.Get("itag"))
 	format, ok := newFormat(itag)
-
 	if !ok {
 		log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
 		return
