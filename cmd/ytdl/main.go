@@ -10,7 +10,7 @@ import (
 
 	"encoding/json"
 
-	"github.com/corny/ytdl"
+	"github.com/rylio/ytdl"
 	"github.com/mattn/go-isatty"
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog"

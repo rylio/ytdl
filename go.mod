@@ -1,4 +1,4 @@
-module github.com/corny/ytdl
+module github.com/rylio/ytdl
 
 go 1.13
 

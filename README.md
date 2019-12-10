@@ -2,10 +2,10 @@
 
 Go library for downloading YouTube videos
 
-[![Documentation](https://godoc.org/github.com/corny/ytdl?status.svg)](http://godoc.org/github.com/corny/ytdl)
-[![CircleCI](https://circleci.com/gh/corny/ytdl.svg?style=shield)](https://circleci.com/gh/corny/ytdl)
-[![Codecov](https://codecov.io/gh/corny/ytdl/branch/master/graph/badge.svg)](https://codecov.io/gh/corny/ytdl)
-[![Go ReportCard](http://goreportcard.com/badge/corny/ytdl)](http://goreportcard.com/report/corny/ytdl)
+[![Documentation](https://godoc.org/github.com/rylio/ytdl?status.svg)](http://godoc.org/github.com/rylio/ytdl)
+[![CircleCI](https://circleci.com/gh/rylio/ytdl.svg?style=shield)](https://circleci.com/gh/rylio/ytdl)
+[![Codecov](https://codecov.io/gh/rylio/ytdl/branch/master/graph/badge.svg)](https://codecov.io/gh/rylio/ytdl)
+[![Go ReportCard](http://goreportcard.com/badge/rylio/ytdl)](http://goreportcard.com/report/rylio/ytdl)
 
 
 ## Example
@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/corny/ytdl"
+	"github.com/rylio/ytdl"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 
 ## ytdl CLI
 
-- To install: `go get -u github.com/corny/ytdl/...`
+- To install: `go get -u github.com/rylio/ytdl/...`
 
 - Or use Docker image `docker pull brucewangno1/ytdl:1.0`
 
