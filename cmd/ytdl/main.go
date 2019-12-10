@@ -55,7 +55,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:  "silent, s",
-			Usage: "Only output errors, also disables progress bar",
+			Usage: "Only output errors",
 		},
 		cli.BoolFlag{
 			Name:  "debug, d",
