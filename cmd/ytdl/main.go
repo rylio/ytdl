@@ -10,11 +10,11 @@ import (
 
 	"encoding/json"
 
-	"github.com/rylio/ytdl"
 	"github.com/mattn/go-isatty"
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/rylio/ytdl"
 	"github.com/urfave/cli"
 )
 
@@ -144,7 +144,7 @@ func handler(identifier string, options options) {
 	}
 	log.Logger = log.Output(logOut)
 
-	// ouput only errors or not
+	// output only errors or not
 	silent := options.outputFile == "" ||
 		options.silent || options.infoOnly || options.downloadURL || options.json
 	if silent {

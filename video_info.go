@@ -18,7 +18,7 @@ import (
 )
 
 const youtubeBaseURL = "https://www.youtube.com/watch"
-const youtubeEmbededBaseURL = "https://www.youtube.com/embed/"
+const youtubeEmbeddedBaseURL = "https://www.youtube.com/embed/"
 const youtubeVideoEURL = "https://youtube.googleapis.com/v/"
 const youtubeVideoInfoURL = "https://www.youtube.com/get_video_info"
 const youtubeDateFormat = "2006-01-02"
@@ -297,10 +297,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	var jsonConfig map[string]interface{}
 
-	html, err := httpGetAndCheckResponseReadBody(youtubeEmbededBaseURL + id)
+	html, err := httpGetAndCheckResponseReadBody(youtubeEmbeddedBaseURL + id)
 
 	if err != nil {
-		return nil, fmt.Errorf("Embeded url request returned %w", err)
+		return nil, fmt.Errorf("Embedded url request returned %w", err)
 	}
 
 	//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
