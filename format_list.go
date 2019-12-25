@@ -3,10 +3,8 @@ package ytdl
 import (
 	"bufio"
 	"io"
-	"net/url"
 	"sort"
 	"strconv"
-	"strings"
 
 	"github.com/rs/zerolog/log"
 )
@@ -84,6 +82,30 @@ func (formats FormatList) Copy() FormatList {
 	return dst
 }
 
+func (formats *FormatList) add(infos []formatInfo) {
+	for _, info := range infos {
+
+		format, ok := newFormat(info.Itag)
+		if !ok {
+			log.Debug().Msgf("No metadata found for itag: %v, skipping...", info.Itag)
+		}
+
+		if info.Cipher != nil {
+			meta, err := parseQuery(*info.Cipher)
+			if err != nil {
+				log.Debug().Err(err).Msgf("Unable to parse cipher: %v", info.Cipher)
+			}
+			format.meta = meta
+		} else {
+			format.meta = map[string]string{
+				"url": info.URL,
+			}
+		}
+
+		*formats = append(*formats, format)
+	}
+}
+
 func (formats *FormatList) parseFormats(rd io.Reader) {
 	r := bufio.NewReader(rd)
 
@@ -99,30 +121,21 @@ func (formats *FormatList) parseFormats(rd io.Reader) {
 }
 
 func (formats *FormatList) parseFormat(input string) {
-	query, err := url.ParseQuery(input)
+	meta, err := parseQuery(input)
+
 	if err != nil {
-		log.Debug().Msgf("Unable to parse format as query: %v", query)
+		log.Debug().Err(err).Msgf("Unable to parse format: %v", input)
 		return
 	}
 
-	itag, _ := strconv.Atoi(query.Get("itag"))
+	itag, _ := strconv.Atoi(meta["itag"])
 	format, ok := newFormat(itag)
 	if !ok {
 		log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
 		return
 	}
 
-	if strings.HasPrefix(query.Get("conn"), "rtmp") {
-		format.meta["rtmp"] = true
-	}
-	for k, v := range query {
-		if len(v) == 1 {
-			format.meta[k] = v[0]
-		} else {
-			format.meta[k] = v
-		}
-	}
-
+	format.meta = meta
 	*formats = append(*formats, format)
 }
 

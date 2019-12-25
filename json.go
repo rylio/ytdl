@@ -17,11 +17,38 @@ type playerConfig struct {
 	} `json:"args"`
 }
 
+type formatInfo struct {
+	Itag             int     `json:"itag"`
+	MimeType         string  `json:"mimeType"`
+	Bitrate          int     `json:"bitrate"`
+	Width            int     `json:"width"`
+	Height           int     `json:"height"`
+	LastModified     string  `json:"lastModified"`
+	ContentLength    string  `json:"contentLength"`
+	Quality          string  `json:"quality"`
+	QualityLabel     string  `json:"qualityLabel"`
+	ProjectionType   string  `json:"projectionType"`
+	AverageBitrate   int     `json:"averageBitrate"`
+	AudioQuality     string  `json:"audioQuality"`
+	ApproxDurationMs string  `json:"approxDurationMs"`
+	AudioSampleRate  string  `json:"audioSampleRate"`
+	AudioChannels    int     `json:"audioChannels"`
+	Cipher           *string `json:"cipher"`
+	URL              string  `json:"url"`
+}
+
 type playerResponse struct {
 	PlayabilityStatus struct {
 		Status string `json:"status"`
 		Reason string `json:"reason"`
 	} `json:"playabilityStatus"`
+
+	StreamingData struct {
+		ExpiresInSeconds string       `json:"expiresInSeconds"`
+		Formats          []formatInfo `json:"formats"`
+		AdaptiveFormats  []formatInfo `json:"adaptiveFormats"`
+	} `json:"streamingData"`
+
 	VideoDetails struct {
 		Title         string   `json:"title"`
 		Author        string   `json:"author"`
@@ -29,6 +56,7 @@ type playerResponse struct {
 		Keywords      []string `json:"keywords"`
 		ViewCount     string   `json:"viewCount"`
 	} `json:"videoDetails"`
+
 	Microformat struct {
 		Renderer struct {
 			ViewCount   string `json:"viewCount"`

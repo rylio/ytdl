@@ -162,7 +162,6 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 	// match json in javascript
 	if matches := regexpPlayerConfig.FindSubmatch(html); len(matches) > 1 {
-
 		err := json.Unmarshal(matches[1], &jsonConfig)
 		if err != nil {
 			return nil, err
@@ -220,6 +219,10 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		return nil, fmt.Errorf("Error %s:%s", inf.Errorcode, inf.Reason)
 	}
 
+	var formats FormatList
+	formats.parseFormats(strings.NewReader(inf.URLEncodedFmtStreamMap))
+	formats.parseFormats(strings.NewReader(inf.AdaptiveFmts))
+
 	if inf.PlayerResponse != "" {
 		response := &playerResponse{}
 
@@ -230,6 +233,9 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		if response.PlayabilityStatus.Status != "OK" {
 			return nil, fmt.Errorf("Unavailable because: %s", response.PlayabilityStatus.Reason)
 		}
+
+		formats.add(response.StreamingData.Formats)
+		formats.add(response.StreamingData.AdaptiveFormats)
 
 		if seconds := response.VideoDetails.LengthSeconds; seconds != "" {
 			val, err := strconv.Atoi(seconds)
@@ -251,10 +257,6 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	}
 
 	info.htmlPlayerFile = jsonConfig.Assets.JS
-
-	var formats FormatList
-	formats.parseFormats(strings.NewReader(inf.URLEncodedFmtStreamMap))
-	formats.parseFormats(strings.NewReader(inf.AdaptiveFmts))
 
 	if len(formats) == 0 {
 		log.Debug().Msgf("No formats found")

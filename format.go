@@ -1,6 +1,8 @@
 package ytdl
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // FormatKey is a string type containing a key in a video format map
 type FormatKey string
@@ -24,7 +26,7 @@ type Format struct {
 	VideoEncoding string `json:"videoEncoding"`
 	AudioEncoding string `json:"audioEncoding"`
 	AudioBitrate  int    `json:"audioBitrate"`
-	meta          map[string]interface{}
+	meta          map[string]string
 }
 
 func newFormat(itag int) (Format, bool) {

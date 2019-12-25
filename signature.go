@@ -10,28 +10,26 @@ import (
 
 func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	var sig string
-	if s, ok := format.meta["s"]; ok && len(s.(string)) > 0 {
+	if s, ok := format.meta["s"]; ok && len(s) > 0 {
 		tokens, err := getSigTokens(htmlPlayerFile)
 		if err != nil {
 			return nil, err
 		}
-		sig = decipherTokens(tokens, s.(string))
+		sig = decipherTokens(tokens, s)
 	} else {
-		if s, ok := format.meta["sig"]; ok {
-			sig = s.(string)
-		}
+		sig = format.meta["sig"]
 	}
 	var urlString string
 	if s, ok := format.meta["url"]; ok {
-		urlString = s.(string)
+		urlString = s
 	} else if s, ok := format.meta["stream"]; ok {
 		if c, ok := format.meta["conn"]; ok {
-			urlString = c.(string)
+			urlString = c
 			if urlString[len(urlString)-1] != '/' {
 				urlString += "/"
 			}
 		}
-		urlString += s.(string)
+		urlString += s
 	} else {
 		return nil, fmt.Errorf("Couldn't extract url from format")
 	}
@@ -47,7 +45,7 @@ func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	query.Set("ratebypass", "yes")
 	if len(sig) > 0 {
 		sigParam := "signature"
-		if v, ok := format.meta["sp"].(string); ok && v != "" {
+		if v, ok := format.meta["sp"]; ok && v != "" {
 			sigParam = v
 		}
 
