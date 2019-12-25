@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestVideoInfo(t *testing.T) {
@@ -30,6 +31,9 @@ func TestVideoInfo(t *testing.T) {
 			url:       "https://www.facebook.com/video.php?v=10153820411888896",
 			assertion: assert.False,
 		},
+		//{
+		//	url: "https://www.youtube.com/watch?v=TDgn8k9uyW4",
+		//},
 		{
 			url:         "https://www.youtube.com/watch?v=BaW_jenozKc",
 			assertion:   assert.True,
@@ -110,24 +114,27 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 
 func TestGetDownloadURL(t *testing.T) {
 	testCases := []string{
-		"https://www.youtube.com/watch?v=FrG4TEcSuRg",
-		"https://www.youtube.com/watch?v=jgVhBThJdXc",
-		"https://www.youtube.com/watch?v=MXgnIP4rMoI",
-		"https://www.youtube.com/watch?v=peBgUMT26jM",
-		"https://www.youtube.com/watch?v=aQZDbBGBJsM",
-		"https://www.youtube.com/watch?v=cRS4mS4gKwg",
-		"https://www.youtube.com/watch?v=0fllyJTBsRU",
+		"FrG4TEcSuRg",
+		"jgVhBThJdXc",
+		"MXgnIP4rMoI",
+		"peBgUMT26jM",
+		"aQZDbBGBJsM",
+		"cRS4mS4gKwg",
+		"0fllyJTBsRU",
 	}
-	for _, url := range testCases {
-		info, err := GetVideoInfo(url)
-		if err != nil {
-			t.Fatal(err)
-		}
-		format := info.Formats.Worst(FormatResolutionKey)[0]
-		_, err = info.GetDownloadURL(format)
-		if err != nil {
-			t.Error("Failed test case:", url, err)
-		}
+	for _, id := range testCases {
+		t.Run(id, func(t *testing.T) {
+			info, err := GetVideoInfo("https://www.youtube.com/watch?v=" + id)
+			require.NoError(t, err)
+
+			if len(info.Formats) == 0 {
+				t.Fatal("empty format list")
+			}
+
+			format := info.Formats.Worst(FormatResolutionKey)[0]
+			_, err = info.GetDownloadURL(format)
+			assert.NoError(t, err)
+		})
 	}
 }
 
