@@ -28,9 +28,10 @@ type Format struct {
 }
 
 func newFormat(itag int) (Format, bool) {
-	if f, ok := FORMATS[itag]; ok {
-		f.meta = make(map[string]interface{})
-		return f, true
+	if itag < len(FORMATS) {
+		if f := FORMATS[itag]; f.Itag > 0 {
+			return f, true
+		}
 	}
 	return Format{}, false
 }
@@ -89,7 +90,7 @@ func (f Format) CompareKey(other Format, key FormatKey) int {
 }
 
 // FORMATS is a map of all itags and their formats
-var FORMATS = map[int]Format{
+var FORMATS = []Format{
 	5: {
 		Extension:     "flv",
 		Resolution:    "240p",
