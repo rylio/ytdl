@@ -18,6 +18,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+var (
+	version = "dev"
+)
+
 type options struct {
 	outputFile     string
 	infoOnly       bool
@@ -40,7 +44,7 @@ func main() {
 	app.ArgsUsage = "[youtube url or video id]"
 	app.Usage = "Download youtube videos"
 	app.HideHelp = true
-	app.Version = "0.5.0"
+	app.Version = version
 
 	app.Flags = []cli.Flag{
 		cli.HelpFlag,

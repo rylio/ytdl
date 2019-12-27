@@ -1,5 +1,5 @@
 builds:
-  - main: ./cmd/ytdl/main.go
+  - main: ./cmd/ytdl
     binary: ytdl
     goos:
       - windows
