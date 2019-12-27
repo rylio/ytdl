@@ -94,7 +94,7 @@ func GetVideoInfoFromID(id string) (*VideoInfo, error) {
 }
 
 // GetDownloadURL gets the download url for a format
-func (info *VideoInfo) GetDownloadURL(format Format) (*url.URL, error) {
+func (info *VideoInfo) GetDownloadURL(format *Format) (*url.URL, error) {
 	return getDownloadURL(format, info.htmlPlayerFile)
 }
 
@@ -107,7 +107,7 @@ func (info *VideoInfo) GetThumbnailURL(quality ThumbnailQuality) *url.URL {
 }
 
 // Download is a convenience method to download a format to an io.Writer
-func (info *VideoInfo) Download(format Format, dest io.Writer) error {
+func (info *VideoInfo) Download(format *Format, dest io.Writer) error {
 	u, err := info.GetDownloadURL(format)
 	if err != nil {
 		return err
@@ -321,7 +321,7 @@ func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	return jsonConfig, nil
 }
 
-func getDashManifest(urlString string) (formats []Format, err error) {
+func getDashManifest(urlString string) (formats []*Format, err error) {
 
 	resp, err := httpGetAndCheckResponse(urlString)
 	if err != nil {
@@ -338,12 +338,12 @@ func getDashManifest(urlString string) (formats []Format, err error) {
 			if err != nil {
 				break
 			}
-			if format, ok := newFormat(rep.Itag); ok {
-				format.meta["url"] = rep.URL
+			if itag := getItag(rep.Itag); itag != nil {
+				format := &Format{
+					url: rep.URL,
+				}
 				if rep.Height != 0 {
-					format.Resolution = strconv.Itoa(rep.Height) + "p"
-				} else {
-					format.Resolution = ""
+					format.resolution = strconv.Itoa(rep.Height) + "p"
 				}
 				formats = append(formats, format)
 			} else {

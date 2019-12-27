@@ -11,12 +11,12 @@ import (
 )
 
 var formats = FormatList{
-	FORMATS[18],
-	FORMATS[22],
-	FORMATS[34],
-	FORMATS[37],
-	FORMATS[133],
-	FORMATS[139],
+	&Format{Itag: getItag(18)},
+	&Format{Itag: getItag(22)},
+	&Format{Itag: getItag(34)},
+	&Format{Itag: getItag(37)},
+	&Format{Itag: getItag(133)},
+	&Format{Itag: getItag(139)},
 }
 
 type formatListTestCase struct {
@@ -191,17 +191,13 @@ func TestParseStreamList(t *testing.T) {
 
 	require.Len(formats, 2)
 	format := formats[0]
-	assert.Equal(22, format.Itag)
-	assert.Equal("mp4", format.Extension)
-	assert.Equal("720p", format.Resolution)
-	assert.Equal("H.264", format.VideoEncoding)
-	assert.Equal("aac", format.AudioEncoding)
-	assert.Equal(192, format.AudioBitrate)
-
-	meta := format.meta
-	assert.Len(meta, 4)
-	assert.Equal(`video/mp4; codecs="avc1.64001F, mp4a.40.2"`, meta["type"])
-	assert.Len(meta["url"], 769)
+	assert.Equal(22, format.Itag.Itag)
+	assert.Equal("mp4", format.Itag.Extension)
+	assert.Equal("720p", format.Resolution())
+	assert.Equal("H.264", format.Itag.VideoEncoding)
+	assert.Equal("aac", format.Itag.AudioEncoding)
+	assert.Equal(192, format.Itag.AudioBitrate)
+	assert.Len(format.url, 769)
 }
 
 func TestParseStreamListEmpty(t *testing.T) {

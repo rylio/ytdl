@@ -91,6 +91,16 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 			duration:  time.Second * 162,
 			published: newDate(2014, 9, 3),
 		},
+		// 256k DASH audio (format 141) via DASH manifest
+		{
+			url:         "https://www.youtube.com/watch?v=a9LDPn-MO4I",
+			assertion:   assert.True,
+			title:       "UHDTV TEST 8K VIDEO.mp4",
+			uploader:    "8KVIDEO",
+			description: "",
+			duration:    time.Second * 60,
+			published:   newDate(2012, 10, 2),
+		},
 	}
 
 	for _, tt := range tests {

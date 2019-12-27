@@ -8,28 +8,28 @@ import (
 	"strings"
 )
 
-func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
+func getDownloadURL(format *Format, htmlPlayerFile string) (*url.URL, error) {
 	var sig string
-	if s, ok := format.meta["s"]; ok && len(s) > 0 {
+	if format.s != "" {
 		tokens, err := getSigTokens(htmlPlayerFile)
 		if err != nil {
 			return nil, err
 		}
-		sig = decipherTokens(tokens, s)
+		sig = decipherTokens(tokens, format.s)
 	} else {
-		sig = format.meta["sig"]
+		sig = format.sig
 	}
 	var urlString string
-	if s, ok := format.meta["url"]; ok {
-		urlString = s
-	} else if s, ok := format.meta["stream"]; ok {
-		if c, ok := format.meta["conn"]; ok {
-			urlString = c
+	if format.url != "" {
+		urlString = format.url
+	} else if format.stream != "" {
+		if format.conn != "" {
+			urlString = format.conn
 			if urlString[len(urlString)-1] != '/' {
 				urlString += "/"
 			}
 		}
-		urlString += s
+		urlString += format.stream
 	} else {
 		return nil, fmt.Errorf("Couldn't extract url from format")
 	}
@@ -44,9 +44,11 @@ func getDownloadURL(format Format, htmlPlayerFile string) (*url.URL, error) {
 	query := u.Query()
 	query.Set("ratebypass", "yes")
 	if len(sig) > 0 {
-		sigParam := "signature"
-		if v, ok := format.meta["sp"]; ok && v != "" {
-			sigParam = v
+		var sigParam string
+		if format.sp != "" {
+			sigParam = format.sp
+		} else {
+			sigParam = "signature"
 		}
 
 		query.Set(sigParam, sig)

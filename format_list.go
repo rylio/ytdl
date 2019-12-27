@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"io"
 	"sort"
-	"strconv"
 
 	"github.com/rs/zerolog/log"
 )
 
 // FormatList is a slice of formats with filtering functionality
-type FormatList []Format
+type FormatList []*Format
 
 func (formats FormatList) Filter(key FormatKey, values []interface{}) FormatList {
 	var dst FormatList
@@ -84,24 +83,28 @@ func (formats FormatList) Copy() FormatList {
 
 func (formats *FormatList) add(infos []formatInfo) {
 	for _, info := range infos {
+		var err error
+		var format *Format
 
-		format, ok := newFormat(info.Itag)
-		if !ok {
-			log.Debug().Msgf("No metadata found for itag: %v, skipping...", info.Itag)
+		itag := getItag(info.Itag)
+		if itag == nil {
+			log.Debug().Msgf("No itag found with number: %v, skipping...", info.Itag)
+			continue
 		}
 
 		if info.Cipher != nil {
-			meta, err := parseQuery(*info.Cipher)
+			format, err = parseFormat(*info.Cipher)
 			if err != nil {
 				log.Debug().Err(err).Msgf("Unable to parse cipher: %v", info.Cipher)
+				continue
 			}
-			format.meta = meta
 		} else {
-			format.meta = map[string]string{
-				"url": info.URL,
+			format = &Format{
+				url: info.URL,
 			}
 		}
 
+		format.Itag = itag
 		*formats = append(*formats, format)
 	}
 }
@@ -121,21 +124,13 @@ func (formats *FormatList) parseFormats(rd io.Reader) {
 }
 
 func (formats *FormatList) parseFormat(input string) {
-	meta, err := parseQuery(input)
+	format, err := parseFormat(input)
 
 	if err != nil {
-		log.Debug().Err(err).Msgf("Unable to parse format: %v", input)
+		log.Debug().Err(err).Msg("Unable to parse format")
 		return
 	}
 
-	itag, _ := strconv.Atoi(meta["itag"])
-	format, ok := newFormat(itag)
-	if !ok {
-		log.Debug().Msgf("No metadata found for itag: %v, skipping...", itag)
-		return
-	}
-
-	format.meta = meta
 	*formats = append(*formats, format)
 }
 

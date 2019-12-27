@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 
 	"github.com/rs/zerolog/log"
 )
@@ -58,18 +57,4 @@ func httpGetAndCheckResponseReadBody(url string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	return ioutil.ReadAll(resp.Body)
-}
-
-func parseQuery(input string) (map[string]string, error) {
-	query, err := url.ParseQuery(input)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make(map[string]string)
-
-	for k, v := range query {
-		result[k] = v[0]
-	}
-	return result, nil
 }
