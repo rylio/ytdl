@@ -98,13 +98,14 @@ func (formats *FormatList) add(infos []formatInfo) {
 				log.Debug().Err(err).Msgf("Unable to parse cipher: %v", info.Cipher)
 				continue
 			}
+			format.Itag = *itag
 		} else {
 			format = &Format{
-				url: info.URL,
+				Itag: *itag,
+				url:  info.URL,
 			}
 		}
 
-		format.Itag = itag
 		*formats = append(*formats, format)
 	}
 }

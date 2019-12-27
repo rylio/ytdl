@@ -11,12 +11,12 @@ import (
 )
 
 var formats = FormatList{
-	&Format{Itag: getItag(18)},
-	&Format{Itag: getItag(22)},
-	&Format{Itag: getItag(34)},
-	&Format{Itag: getItag(37)},
-	&Format{Itag: getItag(133)},
-	&Format{Itag: getItag(139)},
+	&Format{Itag: *getItag(18)},
+	&Format{Itag: *getItag(22)},
+	&Format{Itag: *getItag(34)},
+	&Format{Itag: *getItag(37)},
+	&Format{Itag: *getItag(133)},
+	&Format{Itag: *getItag(139)},
 }
 
 type formatListTestCase struct {
@@ -193,7 +193,7 @@ func TestParseStreamList(t *testing.T) {
 	format := formats[0]
 	assert.Equal(22, format.Itag.Itag)
 	assert.Equal("mp4", format.Itag.Extension)
-	assert.Equal("720p", format.Resolution())
+	assert.Equal("720p", format.Itag.Resolution)
 	assert.Equal("H.264", format.Itag.VideoEncoding)
 	assert.Equal("aac", format.Itag.AudioEncoding)
 	assert.Equal(192, format.Itag.AudioBitrate)

@@ -194,7 +194,7 @@ func handler(identifier string, options options) {
 				fps = format.ValueForKey("fps").(string)
 			}
 
-			data = append(data, []string{strconv.Itoa(format.Itag.Itag), format.Itag.Extension, format.Resolution(), fps, format.Itag.VideoEncoding, format.Itag.AudioEncoding, strconv.Itoa(format.Itag.AudioBitrate)})
+			data = append(data, []string{strconv.Itoa(format.Itag.Itag), format.Itag.Extension, format.Itag.Resolution, fps, format.Itag.VideoEncoding, format.Itag.AudioEncoding, strconv.Itoa(format.Itag.AudioBitrate)})
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
@@ -262,7 +262,7 @@ func handler(identifier string, options options) {
 			Title:         sanitizeFileNamePart(info.Title),
 			Ext:           sanitizeFileNamePart(format.Itag.Extension),
 			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
-			Resolution:    sanitizeFileNamePart(format.Resolution()),
+			Resolution:    sanitizeFileNamePart(format.Itag.Resolution),
 			Duration:      sanitizeFileNamePart(info.Duration.String()),
 		})
 		if err != nil {

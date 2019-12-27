@@ -23,14 +23,14 @@ const (
 )
 
 type Format struct {
-	Itag       *Itag
-	resolution string
-	url        string
-	s          string
-	sig        string
-	stream     string
-	conn       string
-	sp         string
+	Itag Itag
+
+	url    string
+	s      string
+	sig    string
+	stream string
+	conn   string
+	sp     string
 }
 
 func parseFormat(input string) (*Format, error) {
@@ -54,7 +54,7 @@ func parseFormat(input string) (*Format, error) {
 				return nil, fmt.Errorf("no metadata found for itag: %v", i)
 			}
 
-			format.Itag = itag
+			format.Itag = *itag
 		case "url":
 			format.url = v[0]
 		case "s":
@@ -80,7 +80,7 @@ func (f *Format) ValueForKey(key FormatKey) interface{} {
 	case FormatExtensionKey:
 		return f.Itag.Extension
 	case FormatResolutionKey:
-		return f.Resolution()
+		return f.Itag.Resolution
 	case FormatVideoEncodingKey:
 		return f.Itag.VideoEncoding
 	case FormatAudioEncodingKey:
@@ -121,12 +121,4 @@ func (f *Format) CompareKey(other *Format, key FormatKey) int {
 	default:
 		return 0
 	}
-}
-
-// Resolution returns the resolution
-func (f *Format) Resolution() string {
-	if f.resolution != "" {
-		return f.resolution
-	}
-	return f.Itag.Resolution
 }

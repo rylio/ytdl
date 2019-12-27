@@ -340,10 +340,11 @@ func getDashManifest(urlString string) (formats []*Format, err error) {
 			}
 			if itag := getItag(rep.Itag); itag != nil {
 				format := &Format{
-					url: rep.URL,
+					Itag: *itag,
+					url:  rep.URL,
 				}
 				if rep.Height != 0 {
-					format.resolution = strconv.Itoa(rep.Height) + "p"
+					format.Itag.Resolution = strconv.Itoa(rep.Height) + "p"
 				}
 				formats = append(formats, format)
 			} else {
