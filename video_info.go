@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -46,14 +45,15 @@ func GetVideoInfo(value interface{}) (*VideoInfo, error) {
 	case *url.URL:
 		return GetVideoInfoFromURL(t)
 	case string:
-		u, err := url.ParseRequestURI(t)
-		if err != nil {
-			return GetVideoInfoFromID(t)
+		if strings.HasPrefix(t, "https://") {
+			uri, err := url.ParseRequestURI(t)
+			if err != nil {
+				return nil, err
+			}
+			return GetVideoInfo(uri)
 		}
-		if u.Host == "youtu.be" {
-			return GetVideoInfoFromShortURL(u)
-		}
-		return GetVideoInfoFromURL(u)
+
+		return GetVideoInfoFromID(t)
 	default:
 		return nil, fmt.Errorf("Identifier type must be a string, *url.URL, or []byte")
 	}
@@ -61,7 +61,7 @@ func GetVideoInfo(value interface{}) (*VideoInfo, error) {
 
 // GetVideoInfoFromURL fetches video info from a youtube url
 func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
-	videoID := u.Query().Get("v")
+	videoID := extractVideoID(u)
 	if len(videoID) == 0 {
 		return nil, fmt.Errorf("Invalid youtube url, no video id")
 	}
@@ -69,23 +69,26 @@ func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
 }
 
 // GetVideoInfoFromShortURL fetches video info from a short youtube url
-func GetVideoInfoFromShortURL(u *url.URL) (*VideoInfo, error) {
-	if len(u.Path) >= 1 {
-		if path := u.Path[1:]; path != "" {
-			return GetVideoInfoFromID(path)
+func extractVideoID(u *url.URL) string {
+	switch u.Host {
+	case "www.youtube.com", "youtube.com":
+		if u.Path == "/watch" {
+			return u.Query().Get("v")
+		}
+		if strings.HasPrefix(u.Path, "/embed/") {
+			return u.Path[7:]
+		}
+	case "youtu.be":
+		if len(u.Path) > 1 {
+			return u.Path[1:]
 		}
 	}
-	return nil, errors.New("Could not parse short URL")
+	return ""
 }
 
 // GetVideoInfoFromID fetches video info from a youtube video id
 func GetVideoInfoFromID(id string) (*VideoInfo, error) {
-	u, _ := url.ParseRequestURI(youtubeBaseURL)
-	values := u.Query()
-	values.Set("v", id)
-	u.RawQuery = values.Encode()
-
-	body, err := httpGetAndCheckResponseReadBody(u.String())
+	body, err := httpGetAndCheckResponseReadBody(youtubeBaseURL + "?v=" + id)
 
 	if err != nil {
 		return nil, err

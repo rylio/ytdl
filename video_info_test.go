@@ -3,6 +3,7 @@ package ytdl
 import (
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -120,6 +121,29 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 			}
 		})
 	}
+}
+
+func TestExtractIDfromValidURL(t *testing.T) {
+	tests := []string{
+		"https://youtube.com/watch?v=BaW_jenozKc",
+		"https://www.youtube.com/watch?v=BaW_jenozKc",
+		"https://www.youtube.com/watch?v=BaW_jenozKc&v=UxxajLWwzqY",
+		"https://www.youtube.com/embed/BaW_jenozKc?list=PLEbnTDJUr_IegfoqO4iPnPYQui46QqT0j",
+		"https://youtu.be/BaW_jenozKc",
+	}
+	for _, input := range tests {
+		t.Run(input, func(t *testing.T) {
+			uri, err := url.ParseRequestURI(input)
+			require.NoError(t, err)
+			assert.Equal(t, "BaW_jenozKc", extractVideoID(uri))
+		})
+	}
+}
+
+func TestExtractIDfromInvalidURL(t *testing.T) {
+	uri, err := url.ParseRequestURI("https://otherhost.com/watch?v=BaW_jenozKc")
+	require.NoError(t, err)
+	assert.Equal(t, "", extractVideoID(uri))
 }
 
 func TestGetDownloadURL(t *testing.T) {
