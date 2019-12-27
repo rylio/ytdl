@@ -8,6 +8,7 @@ type Itag struct {
 	VideoEncoding string `json:"videoEncoding"`
 	AudioEncoding string `json:"audioEncoding"`
 	AudioBitrate  int    `json:"audioBitrate"`
+	FPS           int    `json:"fps"` // FPS are frames per second
 }
 
 func getItag(itag int) *Itag {
@@ -303,25 +304,50 @@ var ITAGS = []Itag{
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		Itag:          298,
+		FPS:           60,
 	},
 	299: {
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
 		Itag:          299,
+		FPS:           60,
 	},
 	302: {
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP9",
 		Itag:          302,
+		FPS:           60,
 	},
 	303: {
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP9",
 		Itag:          303,
+		FPS:           60,
 	},
+	308: {
+		Extension:     "webm",
+		Resolution:    "1440p",
+		VideoEncoding: "VP9",
+		Itag:          308,
+		FPS:           60,
+	},
+	313: {
+		Extension:     "webm",
+		Resolution:    "2160p",
+		VideoEncoding: "VP9",
+		Itag:          313,
+	},
+	315: {
+		Extension:     "webm",
+		Resolution:    "2160p",
+		VideoEncoding: "VP9",
+		Itag:          315,
+		FPS:           60,
+	},
+
 	// DASH (audio only)
 	139: {
 		Extension:     "mp4",
