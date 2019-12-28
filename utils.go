@@ -42,7 +42,7 @@ func httpGetAndCheckResponse(url string) (*http.Response, error) {
 
 	if resp.StatusCode != 200 {
 		resp.Body.Close()
-		return nil, fmt.Errorf("unexpected response: %w", err)
+		return nil, fmt.Errorf("unexpected status code: %v", resp.StatusCode)
 	}
 
 	return resp, nil
