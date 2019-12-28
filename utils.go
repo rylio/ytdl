@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/rs/zerolog/log"
 )
 
 func reverseStringSlice(s []string) {

@@ -159,6 +159,8 @@ func handler(identifier string, options options) {
 		log.Logger = log.Level(zerolog.InfoLevel)
 	}
 
+	ytdl.SetLogger(log.Logger)
+
 	// TODO: Show activity indicator
 	log.Info().Msg("Fetching video info...")
 	//fmt.Print("\u001b[0G")

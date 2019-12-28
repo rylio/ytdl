@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"io"
 	"sort"
-
-	"github.com/rs/zerolog/log"
 )
 
 // FormatList is a slice of formats with filtering functionality

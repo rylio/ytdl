@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-
-	"github.com/rs/zerolog/log"
 )
 
 // FormatKey is a string type containing a key in a video format map
