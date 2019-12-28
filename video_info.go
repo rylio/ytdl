@@ -1,6 +1,7 @@
 package ytdl
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
@@ -40,31 +41,31 @@ type VideoInfo struct {
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
 func GetVideoInfo(value interface{}) (*VideoInfo, error) {
+	return DefaultClient.GetVideoInfo(value)
+}
+
+// GetVideoInfo fetches info from a url string, url object, or a url string
+func (c *Client) GetVideoInfo(value interface{}) (*VideoInfo, error) {
 	switch t := value.(type) {
 	case *url.URL:
-		return GetVideoInfoFromURL(t)
+		videoID := extractVideoID(t)
+		if len(videoID) == 0 {
+			return nil, fmt.Errorf("invalid youtube URL, no video id")
+		}
+		return c.GetVideoInfoFromID(videoID)
 	case string:
 		if strings.HasPrefix(t, "https://") {
 			uri, err := url.ParseRequestURI(t)
 			if err != nil {
 				return nil, err
 			}
-			return GetVideoInfo(uri)
+			return c.GetVideoInfo(uri)
 		}
 
-		return GetVideoInfoFromID(t)
+		return c.GetVideoInfoFromID(t)
 	default:
 		return nil, fmt.Errorf("Identifier type must be a string, *url.URL, or []byte")
 	}
-}
-
-// GetVideoInfoFromURL fetches video info from a youtube url
-func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
-	videoID := extractVideoID(u)
-	if len(videoID) == 0 {
-		return nil, fmt.Errorf("Invalid youtube url, no video id")
-	}
-	return GetVideoInfoFromID(videoID)
 }
 
 // GetVideoInfoFromShortURL fetches video info from a short youtube url
@@ -86,18 +87,18 @@ func extractVideoID(u *url.URL) string {
 }
 
 // GetVideoInfoFromID fetches video info from a youtube video id
-func GetVideoInfoFromID(id string) (*VideoInfo, error) {
-	body, err := httpGetAndCheckResponseReadBody(youtubeBaseURL + "?v=" + id)
+func (c *Client) GetVideoInfoFromID(id string) (*VideoInfo, error) {
+	body, err := c.httpGetAndCheckResponseReadBody(youtubeBaseURL + "?v=" + id)
 
 	if err != nil {
 		return nil, err
 	}
-	return getVideoInfoFromHTML(id, body)
+	return c.getVideoInfoFromHTML(id, body)
 }
 
 // GetDownloadURL gets the download url for a format
-func (info *VideoInfo) GetDownloadURL(format *Format) (*url.URL, error) {
-	return getDownloadURL(format, info.htmlPlayerFile)
+func (c *Client) GetDownloadURL(info *VideoInfo, format *Format) (*url.URL, error) {
+	return c.getDownloadURL(format, info.htmlPlayerFile)
 }
 
 // GetThumbnailURL returns a url for the thumbnail image
@@ -109,13 +110,13 @@ func (info *VideoInfo) GetThumbnailURL(quality ThumbnailQuality) *url.URL {
 }
 
 // Download is a convenience method to download a format to an io.Writer
-func (info *VideoInfo) Download(format *Format, dest io.Writer) error {
-	u, err := info.GetDownloadURL(format)
+func (c *Client) Download(info *VideoInfo, format *Format, dest io.Writer) error {
+	u, err := c.GetDownloadURL(info, format)
 	if err != nil {
 		return err
 	}
 
-	resp, err := httpGetAndCheckResponse(u.String())
+	resp, err := c.httpGetAndCheckResponse(u.String())
 	if err != nil {
 		return err
 	}
@@ -131,7 +132,7 @@ var (
 	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
 )
 
-func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
+func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 	info := &VideoInfo{}
 
@@ -170,7 +171,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
-		info, err := getVideoInfoFromEmbedded(id)
+		info, err := c.getVideoInfoFromEmbedded(id)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +184,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			query.Add("sts", strconv.Itoa(int(sts)))
 		}
 
-		body, err := httpGetAndCheckResponseReadBody(youtubeVideoInfoURL + "?" + query.Encode())
+		body, err := c.httpGetAndCheckResponseReadBody(youtubeVideoInfoURL + "?" + query.Encode())
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read video info: %w", err)
 		}
@@ -221,8 +222,9 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	}
 
 	var formats FormatList
-	formats.parseFormats(strings.NewReader(inf.URLEncodedFmtStreamMap))
-	formats.parseFormats(strings.NewReader(inf.AdaptiveFmts))
+
+	c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.URLEncodedFmtStreamMap))
+	c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.AdaptiveFmts))
 
 	if inf.PlayerResponse != "" {
 		response := &playerResponse{}
@@ -235,8 +237,8 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 			return nil, fmt.Errorf("Unavailable because: %s", response.PlayabilityStatus.Reason)
 		}
 
-		formats.add(response.StreamingData.Formats)
-		formats.add(response.StreamingData.AdaptiveFormats)
+		c.addFormatsByInfos(&formats, response.StreamingData.Formats)
+		c.addFormatsByInfos(&formats, response.StreamingData.AdaptiveFormats)
 
 		if seconds := response.VideoDetails.LengthSeconds; seconds != "" {
 			val, err := strconv.Atoi(seconds)
@@ -264,7 +266,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	}
 
 	if dashManifestURL := inf.Dashmpd; dashManifestURL != "" {
-		tokens, err := getSigTokens(info.htmlPlayerFile)
+		tokens, err := c.getSigTokens(info.htmlPlayerFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
 		}
@@ -273,7 +275,7 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 		dashManifestURL = regex.ReplaceAllStringFunc(dashManifestURL, func(str string) string {
 			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
 		})
-		dashFormats, err := getDashManifest(dashManifestURL)
+		dashFormats, err := c.getDashManifest(dashManifestURL)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
 		}
@@ -297,10 +299,34 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	return info, nil
 }
 
-func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
+func (c *Client) addFormatsByInfos(formats *FormatList, infos []formatInfo) {
+	for _, info := range infos {
+		if err := formats.addByInfo(info); err != nil {
+			log.Debug().Err(err)
+		}
+	}
+}
+
+func (c *Client) addFormatsByQueryStrings(formats *FormatList, rd io.Reader) {
+	r := bufio.NewReader(rd)
+
+	for {
+		line, err := r.ReadString(',')
+
+		if err == io.EOF {
+			break
+		}
+
+		if err := formats.addByQueryString(line[:len(line)-1]); err != nil {
+			log.Debug().Err(err)
+		}
+	}
+}
+
+func (c *Client) getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	var jsonConfig map[string]interface{}
 
-	html, err := httpGetAndCheckResponseReadBody(youtubeEmbeddedBaseURL + id)
+	html, err := c.httpGetAndCheckResponseReadBody(youtubeEmbeddedBaseURL + id)
 
 	if err != nil {
 		return nil, fmt.Errorf("Embedded url request returned %w", err)
@@ -322,9 +348,9 @@ func getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
 	return jsonConfig, nil
 }
 
-func getDashManifest(urlString string) (formats []*Format, err error) {
+func (c *Client) getDashManifest(urlString string) (formats []*Format, err error) {
 
-	resp, err := httpGetAndCheckResponse(urlString)
+	resp, err := c.httpGetAndCheckResponse(urlString)
 	if err != nil {
 		return nil, err
 	}
