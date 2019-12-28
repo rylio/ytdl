@@ -6,7 +6,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -115,14 +114,13 @@ func (info *VideoInfo) Download(format *Format, dest io.Writer) error {
 	if err != nil {
 		return err
 	}
-	resp, err := http.Get(u.String())
+
+	resp, err := httpGetAndCheckResponse(u.String())
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("Invalid status code: %d", resp.StatusCode)
-	}
 	_, err = io.Copy(dest, resp.Body)
 	return err
 }

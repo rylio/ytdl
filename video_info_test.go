@@ -2,7 +2,6 @@ package ytdl
 
 import (
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -200,11 +199,10 @@ func TestThumbnail(t *testing.T) {
 
 	for _, v := range qualities {
 		u := info.GetThumbnailURL(v)
-		resp, err := http.Get(u.String())
+
+		resp, err := httpGetAndCheckResponse(u.String())
 		if err != nil {
 			t.Error(err)
-		} else if resp.StatusCode != 200 {
-			t.Error("Invalid status code", resp.StatusCode, "for", v)
 		}
 		resp.Body.Close()
 	}
