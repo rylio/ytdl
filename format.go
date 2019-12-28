@@ -23,7 +23,7 @@ const (
 )
 
 type Format struct {
-	Itag Itag
+	Itag
 
 	url    string
 	s      string
@@ -76,17 +76,17 @@ func parseFormat(input string) (*Format, error) {
 func (f *Format) ValueForKey(key FormatKey) interface{} {
 	switch key {
 	case FormatItagKey:
-		return f.Itag.Itag
+		return f.Itag.Number
 	case FormatExtensionKey:
-		return f.Itag.Extension
+		return f.Extension
 	case FormatResolutionKey:
-		return f.Itag.Resolution
+		return f.Resolution
 	case FormatVideoEncodingKey:
-		return f.Itag.VideoEncoding
+		return f.VideoEncoding
 	case FormatAudioEncodingKey:
-		return f.Itag.AudioEncoding
+		return f.AudioEncoding
 	case FormatAudioBitrateKey:
-		return f.Itag.AudioBitrate
+		return f.AudioBitrate
 	default:
 		log.Debug().Msgf("Unknown format key: %v", key)
 		return nil
@@ -98,9 +98,9 @@ func (f *Format) CompareKey(other *Format, key FormatKey) int {
 	case FormatResolutionKey:
 		return f.resolution() - other.resolution()
 	case FormatAudioBitrateKey:
-		return f.Itag.AudioBitrate - other.Itag.AudioBitrate
+		return f.AudioBitrate - other.AudioBitrate
 	case FormatFPSKey:
-		return f.Itag.FPS - other.Itag.FPS
+		return f.FPS - other.FPS
 	default:
 		return 0
 	}

@@ -2,531 +2,541 @@ package ytdl
 
 // Itag is a youtube is a static youtube video format
 type Itag struct {
-	Itag          int    `json:"itag"`
-	Extension     string `json:"extension"`
-	Resolution    string `json:"resolution"`
-	VideoEncoding string `json:"videoEncoding"`
-	AudioEncoding string `json:"audioEncoding"`
-	AudioBitrate  int    `json:"audioBitrate"`
-	FPS           int    `json:"fps"` // FPS are frames per second
+	Number        int
+	Extension     string
+	Resolution    string
+	VideoEncoding string
+	AudioEncoding string
+	AudioBitrate  int
+	FPS           int // FPS are frames per second
 }
 
 func getItag(itag int) *Itag {
 	if itag < len(ITAGS) {
-		if f := ITAGS[itag]; f.Itag > 0 {
-			return &ITAGS[itag]
-		}
+		return ITAGS[itag]
 	}
 	return nil
 }
 
 // ITAGS is a map of all itags and their attributes
-var ITAGS = []Itag{
-	5: {
+var ITAGS = generateItags()
+
+func generateItags() (list []*Itag) {
+	list = make([]*Itag, 403)
+
+	add := func(itag Itag) {
+		list[itag.Number] = &itag
+	}
+
+	add(Itag{
+		Number:        5,
 		Extension:     "flv",
 		Resolution:    "240p",
 		VideoEncoding: "Sorenson H.283",
 		AudioEncoding: "mp3",
-		Itag:          5,
 		AudioBitrate:  64,
-	},
-	6: {
+	})
+	add(Itag{
+		Number:        6,
 		Extension:     "flv",
 		Resolution:    "270p",
 		VideoEncoding: "Sorenson H.263",
 		AudioEncoding: "mp3",
-		Itag:          6,
 		AudioBitrate:  64,
-	},
-	13: {
+	})
+	add(Itag{
+		Number:        13,
 		Extension:     "3gp",
 		VideoEncoding: "MPEG-4 Visual",
 		AudioEncoding: "aac",
-		Itag:          13,
-	},
-	17: {
+	})
+	add(Itag{
+		Number:        17,
 		Extension:     "3gp",
 		Resolution:    "144p",
 		VideoEncoding: "MPEG-4 Visual",
 		AudioEncoding: "aac",
-		Itag:          17,
 		AudioBitrate:  24,
-	},
-	18: {
+	})
+	add(Itag{
+		Number:        18,
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          18,
 		AudioBitrate:  96,
-	},
-	22: {
+	})
+	add(Itag{
+		Number:        22,
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          22,
 		AudioBitrate:  192,
-	},
-	34: {
+	})
+	add(Itag{
+		Number:        34,
 		Extension:     "flv",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          34,
 		AudioBitrate:  128,
-	},
-	35: {
+	})
+	add(Itag{
+		Number:        35,
 		Extension:     "flv",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          35,
 		AudioBitrate:  128,
-	},
-	36: {
+	})
+	add(Itag{
+		Number:        36,
 		Extension:     "3gp",
 		Resolution:    "240p",
 		VideoEncoding: "MPEG-4 Visual",
 		AudioEncoding: "aac",
-		Itag:          36,
 		AudioBitrate:  36,
-	},
-	37: {
+	})
+	add(Itag{
+		Number:        37,
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          37,
 		AudioBitrate:  192,
-	},
-	38: {
+	})
+	add(Itag{
+		Number:        38,
 		Extension:     "mp4",
 		Resolution:    "3072p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          38,
 		AudioBitrate:  192,
-	},
-	43: {
+	})
+	add(Itag{
+		Number:        43,
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          43,
 		AudioBitrate:  128,
-	},
-	44: {
+	})
+	add(Itag{
+		Number:        44,
 		Extension:     "webm",
 		Resolution:    "480p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          44,
 		AudioBitrate:  128,
-	},
-	45: {
+	})
+	add(Itag{
+		Number:        45,
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          45,
 		AudioBitrate:  192,
-	},
-	46: {
+	})
+	add(Itag{
+		Number:        46,
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          46,
 		AudioBitrate:  192,
-	},
-	82: {
+	})
+	add(Itag{
+		Number:        82,
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
-		Itag:          82,
 		AudioBitrate:  96,
-	},
-	83: {
+	})
+	add(Itag{
+		Number:        83,
 		Extension:     "mp4",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          83,
 		AudioBitrate:  96,
-	},
-	84: {
+	})
+	add(Itag{
+		Number:        84,
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          84,
 		AudioBitrate:  192,
-	},
-	85: {
+	})
+	add(Itag{
+		Number:        85,
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          85,
 		AudioBitrate:  192,
-	},
-	100: {
+	})
+	add(Itag{
+		Number:        100,
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          100,
 		AudioBitrate:  128,
-	},
-	101: {
+	})
+	add(Itag{
+		Number:        101,
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          101,
 		AudioBitrate:  192,
-	},
-	102: {
+	})
+	add(Itag{
+		Number:        102,
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP8",
 		AudioEncoding: "vorbis",
-		Itag:          102,
 		AudioBitrate:  192,
-	},
+	})
+
 	// DASH (video only)
-	133: {
+	add(Itag{
+		Number:        133,
 		Extension:     "mp4",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
-		Itag:          133,
-	},
-	134: {
+	})
+	add(Itag{
+		Number:        134,
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "H.264",
-		Itag:          134,
-	},
-	135: {
+	})
+	add(Itag{
+		Number:        135,
 		Extension:     "mp4",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
-		Itag:          135,
-	},
-	136: {
+	})
+	add(Itag{
+		Number:        136,
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
-		Itag:          136,
-	},
-	137: {
+	})
+	add(Itag{
+		Number:        137,
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
-		Itag:          137,
-	},
-	138: {
+	})
+	add(Itag{
+		Number:        138,
 		Extension:     "mp4",
 		Resolution:    "2160p",
 		VideoEncoding: "H.264",
-		Itag:          138,
-	},
-	160: {
+	})
+	add(Itag{
+		Number:        160,
 		Extension:     "mp4",
 		Resolution:    "144p",
 		VideoEncoding: "H.264",
-		Itag:          160,
-	},
-	242: {
+	})
+	add(Itag{
+		Number:        242,
 		Extension:     "webm",
 		Resolution:    "240p",
 		VideoEncoding: "VP9",
-		Itag:          242,
-	},
-	243: {
+	})
+	add(Itag{
+		Number:        243,
 		Extension:     "webm",
 		Resolution:    "360p",
 		VideoEncoding: "VP9",
-		Itag:          243,
-	},
-	244: {
+	})
+	add(Itag{
+		Number:        244,
 		Extension:     "webm",
 		Resolution:    "480p",
 		VideoEncoding: "VP9",
-		Itag:          244,
-	},
-	247: {
+	})
+	add(Itag{
+		Number:        247,
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP9",
-		Itag:          247,
-	},
-	248: {
+	})
+	add(Itag{
+		Number:        248,
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP9",
-		Itag:          248,
 		AudioBitrate:  9,
-	},
-	264: {
+	})
+	add(Itag{
+		Number:        264,
 		Extension:     "mp4",
 		Resolution:    "1440p",
 		VideoEncoding: "H.264",
-		Itag:          264,
-	},
-	266: {
+	})
+	add(Itag{
+		Number:        266,
 		Extension:     "mp4",
 		Resolution:    "2160p",
 		VideoEncoding: "H.264",
-		Itag:          266,
-	},
-	271: {
+	})
+	add(Itag{
+		Number:        271,
 		Extension:     "webm",
 		Resolution:    "1440p",
 		VideoEncoding: "VP9",
-		Itag:          271,
-	},
-	272: {
+	})
+	add(Itag{
+		Number:        272,
 		Extension:     "webm",
 		Resolution:    "2160p",
 		VideoEncoding: "VP9",
-		Itag:          272,
-	},
-	278: {
+	})
+	add(Itag{
+		Number:        278,
 		Extension:     "webm",
 		Resolution:    "144p",
 		VideoEncoding: "VP9",
-		Itag:          278,
-	},
-	298: {
+	})
+	add(Itag{
+		Number:        298,
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
-		Itag:          298,
 		FPS:           60,
-	},
-	299: {
+	})
+	add(Itag{
+		Number:        299,
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
-		Itag:          299,
 		FPS:           60,
-	},
-	302: {
+	})
+	add(Itag{
+		Number:        302,
 		Extension:     "webm",
 		Resolution:    "720p",
 		VideoEncoding: "VP9",
-		Itag:          302,
 		FPS:           60,
-	},
-	303: {
+	})
+	add(Itag{
+		Number:        303,
 		Extension:     "webm",
 		Resolution:    "1080p",
 		VideoEncoding: "VP9",
-		Itag:          303,
 		FPS:           60,
-	},
-	308: {
+	})
+	add(Itag{
+		Number:        308,
 		Extension:     "webm",
 		Resolution:    "1440p",
 		VideoEncoding: "VP9",
-		Itag:          308,
 		FPS:           60,
-	},
-	313: {
+	})
+	add(Itag{
+		Number:        313,
 		Extension:     "webm",
 		Resolution:    "2160p",
 		VideoEncoding: "VP9",
-		Itag:          313,
-	},
-	315: {
+	})
+	add(Itag{
+		Number:        315,
 		Extension:     "webm",
 		Resolution:    "2160p",
 		VideoEncoding: "VP9",
-		Itag:          315,
 		FPS:           60,
-	},
+	})
 
 	// DASH (audio only)
-	139: {
+	add(Itag{
+		Number:        139,
 		Extension:     "mp4",
 		AudioEncoding: "aac",
-		Itag:          139,
 		AudioBitrate:  48,
-	},
-	140: {
+	})
+	add(Itag{
+		Number:        140,
 		Extension:     "mp4",
 		AudioEncoding: "aac",
-		Itag:          140,
 		AudioBitrate:  128,
-	},
-	141: {
+	})
+	add(Itag{
+		Number:        141,
 		Extension:     "mp4",
 		AudioEncoding: "aac",
-		Itag:          141,
 		AudioBitrate:  256,
-	},
-	171: {
+	})
+	add(Itag{
+		Number:        171,
 		Extension:     "webm",
 		AudioEncoding: "vorbis",
-		Itag:          171,
 		AudioBitrate:  128,
-	},
-	172: {
+	})
+	add(Itag{
+		Number:        172,
 		Extension:     "webm",
 		AudioEncoding: "vorbis",
-		Itag:          172,
 		AudioBitrate:  192,
-	},
-	249: {
+	})
+	add(Itag{
+		Number:        249,
 		Extension:     "webm",
 		AudioEncoding: "opus",
-		Itag:          249,
 		AudioBitrate:  50,
-	},
-	250: {
+	})
+	add(Itag{
+		Number:        250,
 		Extension:     "webm",
 		AudioEncoding: "opus",
-		Itag:          250,
 		AudioBitrate:  70,
-	},
-	251: {
+	})
+	add(Itag{
+		Number:        251,
 		Extension:     "webm",
 		AudioEncoding: "opus",
-		Itag:          251,
 		AudioBitrate:  160,
-	},
+	})
+
 	// Live streaming
-	92: {
+	add(Itag{
+		Number:        92,
 		Extension:     "ts",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          92,
 		AudioBitrate:  48,
-	},
-	93: {
+	})
+	add(Itag{
+		Number:        93,
 		Extension:     "ts",
 		Resolution:    "480p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          93,
 		AudioBitrate:  128,
-	},
-	94: {
+	})
+	add(Itag{
+		Number:        94,
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          94,
 		AudioBitrate:  128,
-	},
-	95: {
+	})
+	add(Itag{
+		Number:        95,
 		Extension:     "ts",
 		Resolution:    "1080p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          95,
 		AudioBitrate:  256,
-	},
-	96: {
+	})
+	add(Itag{
+		Number:        96,
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          96,
 		AudioBitrate:  256,
-	},
-	120: {
+	})
+	add(Itag{
+		Number:        120,
 		Extension:     "flv",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          120,
 		AudioBitrate:  128,
-	},
-	127: {
+	})
+	add(Itag{
+		Number:        127,
 		Extension:     "ts",
 		AudioEncoding: "aac",
-		Itag:          127,
 		AudioBitrate:  96,
-	},
-	128: {
+	})
+	add(Itag{
+		Number:        128,
 		Extension:     "ts",
 		AudioEncoding: "aac",
-		Itag:          128,
 		AudioBitrate:  96,
-	},
-	132: {
+	})
+	add(Itag{
+		Number:        132,
 		Extension:     "ts",
 		Resolution:    "240p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          132,
 		AudioBitrate:  48,
-	},
-	151: {
+	})
+	add(Itag{
+		Number:        151,
 		Extension:     "ts",
 		Resolution:    "720p",
 		VideoEncoding: "H.264",
 		AudioEncoding: "aac",
-		Itag:          151,
 		AudioBitrate:  24,
-	},
+	})
 
-	394: {
-		Itag:          394,
+	add(Itag{
+		Number:        394,
 		Extension:     "mp4",
 		Resolution:    "144p",
 		VideoEncoding: "AV1",
-	},
-	395: {
-		Itag:          395,
+	})
+	add(Itag{
+		Number:        395,
 		Extension:     "mp4",
 		Resolution:    "240p",
 		VideoEncoding: "AV1",
-	},
-	396: {
-		Itag:          396,
+	})
+	add(Itag{
+		Number:        396,
 		Extension:     "mp4",
 		Resolution:    "360p",
 		VideoEncoding: "AV1",
-	},
-	397: {
-		Itag:          397,
+	})
+	add(Itag{
+		Number:        397,
 		Extension:     "mp4",
 		Resolution:    "480p",
 		VideoEncoding: "AV1",
-	},
-	398: {
-		Itag:          398,
+	})
+	add(Itag{
+		Number:        398,
 		Extension:     "mp4",
 		Resolution:    "720p",
 		VideoEncoding: "AV1",
-	},
-	399: {
-		Itag:          399,
+	})
+	add(Itag{
+		Number:        399,
 		Extension:     "mp4",
 		Resolution:    "1080p",
 		VideoEncoding: "AV1",
-	},
-	400: {
-		Itag:          400,
+	})
+	add(Itag{
+		Number:        400,
 		Extension:     "mp4",
 		Resolution:    "1440p",
 		VideoEncoding: "AV1",
-	},
-	401: {
-		Itag:          401,
+	})
+	add(Itag{
+		Number:        401,
 		Extension:     "mp4",
 		Resolution:    "2160p",
 		VideoEncoding: "AV1",
-	},
-	402: {
-		Itag:          402,
+	})
+	add(Itag{
+		Number:        402,
 		Extension:     "mp4",
 		Resolution:    "2880p",
 		VideoEncoding: "AV1",
-	},
+	})
+
+	return
 }

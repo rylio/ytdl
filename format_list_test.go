@@ -191,7 +191,7 @@ func TestParseStreamList(t *testing.T) {
 
 	require.Len(formats, 2)
 	format := formats[0]
-	assert.Equal(22, format.Itag.Itag)
+	assert.Equal(22, format.Number)
 	assert.Equal("mp4", format.Itag.Extension)
 	assert.Equal("720p", format.Itag.Resolution)
 	assert.Equal("H.264", format.Itag.VideoEncoding)

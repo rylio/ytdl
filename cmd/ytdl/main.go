@@ -198,7 +198,7 @@ func handler(identifier string, options options) {
 				fps = format.ValueForKey("fps").(string)
 			}
 
-			data = append(data, []string{strconv.Itoa(format.Itag.Itag), format.Itag.Extension, format.Itag.Resolution, fps, format.Itag.VideoEncoding, format.Itag.AudioEncoding, strconv.Itoa(format.Itag.AudioBitrate)})
+			data = append(data, []string{strconv.Itoa(format.Number), format.Extension, format.Resolution, fps, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
