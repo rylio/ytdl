@@ -181,13 +181,14 @@ func TestCopy(t *testing.T) {
 func TestParseStreamList(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
+	client := newTestClient(t)
 
 	file, err := os.Open("fixtures/stream_map.txt")
 	require.NoError(err)
 	defer file.Close()
 
 	formats := FormatList{}
-	formats.parseFormats(file)
+	client.addFormatsByQueryStrings(&formats, file)
 
 	require.Len(formats, 2)
 	format := formats[0]
@@ -201,7 +202,8 @@ func TestParseStreamList(t *testing.T) {
 }
 
 func TestParseStreamListEmpty(t *testing.T) {
+	client := newTestClient(t)
 	formats := FormatList{}
-	formats.parseFormats(strings.NewReader(""))
+	client.addFormatsByQueryStrings(&formats, strings.NewReader(""))
 	assert.Len(t, formats, 0)
 }

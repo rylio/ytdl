@@ -1,11 +1,8 @@
 package ytdl
 
 import (
-	"bufio"
-	"io"
+	"fmt"
 	"sort"
-
-	"github.com/rs/zerolog/log"
 )
 
 // FormatList is a slice of formats with filtering functionality
@@ -50,12 +47,11 @@ func (formats FormatList) Worst(key FormatKey) FormatList {
 }
 
 func (formats FormatList) Sort(key FormatKey, reverse bool) {
-	wrapper := formatsSortWrapper{formats, key}
-	if !reverse {
-		sort.Stable(wrapper)
-	} else {
-		sort.Stable(sort.Reverse(wrapper))
+	var wrapper sort.Interface = formatsSortWrapper{formats, key}
+	if reverse {
+		wrapper = sort.Reverse(wrapper)
 	}
+	sort.Stable(wrapper)
 }
 
 func (formats FormatList) Subtract(other FormatList) FormatList {
@@ -81,58 +77,41 @@ func (formats FormatList) Copy() FormatList {
 	return dst
 }
 
-func (formats *FormatList) add(infos []formatInfo) {
-	for _, info := range infos {
-		var err error
-		var format *Format
+func (formats *FormatList) addByInfo(info formatInfo) error {
+	var err error
+	var format *Format
 
-		itag := getItag(info.Itag)
-		if itag == nil {
-			log.Debug().Msgf("No itag found with number: %v, skipping...", info.Itag)
-			continue
-		}
-
-		if info.Cipher != nil {
-			format, err = parseFormat(*info.Cipher)
-			if err != nil {
-				log.Debug().Err(err).Msgf("Unable to parse cipher: %v", info.Cipher)
-				continue
-			}
-			format.Itag = *itag
-		} else {
-			format = &Format{
-				Itag: *itag,
-				url:  info.URL,
-			}
-		}
-
-		*formats = append(*formats, format)
+	itag := getItag(info.Itag)
+	if itag == nil {
+		return fmt.Errorf("no itag found with number: %v", info.Itag)
 	}
-}
 
-func (formats *FormatList) parseFormats(rd io.Reader) {
-	r := bufio.NewReader(rd)
-
-	for {
-		line, err := r.ReadString(',')
-
-		if err == io.EOF {
-			break
+	if info.Cipher != nil {
+		format, err = parseFormat(*info.Cipher)
+		if err != nil {
+			return fmt.Errorf("unable to parse cipher '%v': %w", info.Cipher, err)
 		}
-
-		formats.parseFormat(line[:len(line)-1])
-	}
-}
-
-func (formats *FormatList) parseFormat(input string) {
-	format, err := parseFormat(input)
-
-	if err != nil {
-		log.Debug().Err(err).Msg("Unable to parse format")
-		return
+		format.Itag = *itag
+	} else {
+		format = &Format{
+			Itag: *itag,
+			url:  info.URL,
+		}
 	}
 
 	*formats = append(*formats, format)
+	return nil
+}
+
+func (formats *FormatList) addByQueryString(input string) error {
+	format, err := parseFormat(input)
+
+	if err != nil {
+		return err
+	}
+
+	*formats = append(*formats, format)
+	return nil
 }
 
 type formatsSortWrapper struct {

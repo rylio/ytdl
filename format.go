@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-
-	"github.com/rs/zerolog/log"
 )
 
 // FormatKey is a string type containing a key in a video format map
@@ -33,8 +31,8 @@ type Format struct {
 	sp     string
 }
 
-func parseFormat(input string) (*Format, error) {
-	query, err := url.ParseQuery(input)
+func parseFormat(queryString string) (*Format, error) {
+	query, err := url.ParseQuery(queryString)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +86,7 @@ func (f *Format) ValueForKey(key FormatKey) interface{} {
 	case FormatAudioBitrateKey:
 		return f.AudioBitrate
 	default:
-		log.Debug().Msgf("Unknown format key: %v", key)
-		return nil
+		return fmt.Errorf("Unknown format key: %v", key)
 	}
 }
 

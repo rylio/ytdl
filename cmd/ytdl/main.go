@@ -159,11 +159,16 @@ func handler(identifier string, options options) {
 		log.Logger = log.Level(zerolog.InfoLevel)
 	}
 
+	client := ytdl.Client{
+		HTTPClient: http.DefaultClient,
+		Logger:     log.Logger,
+	}
+
 	// TODO: Show activity indicator
 	log.Info().Msg("Fetching video info...")
 	//fmt.Print("\u001b[0G")
 	//fmt.Print("\u001b[2K")
-	info, err := ytdl.GetVideoInfo(identifier)
+	info, err := client.GetVideoInfo(identifier)
 	if err != nil {
 		err = fmt.Errorf("Unable to fetch video info: %w", err)
 		return
@@ -240,7 +245,7 @@ func handler(identifier string, options options) {
 		return
 	}
 	format := formats[0]
-	downloadURL, err := info.GetDownloadURL(format)
+	downloadURL, err := client.GetDownloadURL(info, format)
 	if err != nil {
 		err = fmt.Errorf("Unable to get download url: %w", err)
 		return

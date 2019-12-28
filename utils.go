@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/rs/zerolog/log"
 )
 
 func reverseStringSlice(s []string) {
@@ -18,7 +16,7 @@ func interfaceToString(val interface{}) string {
 	return fmt.Sprintf("%v", val)
 }
 
-func httpGet(url string) (*http.Response, error) {
+func (c *Client) httpGet(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -29,13 +27,13 @@ func httpGet(url string) (*http.Response, error) {
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0")
 
-	return http.DefaultClient.Do(req)
+	return c.HTTPClient.Do(req)
 }
 
-func httpGetAndCheckResponse(url string) (*http.Response, error) {
-	log.Debug().Msgf("Fetching %v", url)
+func (c *Client) httpGetAndCheckResponse(url string) (*http.Response, error) {
+	c.Logger.Debug().Msgf("Fetching %v", url)
 
-	resp, err := httpGet(url)
+	resp, err := c.httpGet(url)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
@@ -48,8 +46,8 @@ func httpGetAndCheckResponse(url string) (*http.Response, error) {
 	return resp, nil
 }
 
-func httpGetAndCheckResponseReadBody(url string) ([]byte, error) {
-	resp, err := httpGetAndCheckResponse(url)
+func (c *Client) httpGetAndCheckResponseReadBody(url string) ([]byte, error) {
+	resp, err := c.httpGetAndCheckResponse(url)
 	if err != nil {
 		return nil, err
 	}

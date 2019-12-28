@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-func getDownloadURL(format *Format, htmlPlayerFile string) (*url.URL, error) {
+func (c *Client) getDownloadURL(format *Format, htmlPlayerFile string) (*url.URL, error) {
 	var sig string
 	if format.s != "" {
-		tokens, err := getSigTokens(htmlPlayerFile)
+		tokens, err := c.getSigTokens(htmlPlayerFile)
 		if err != nil {
 			return nil, err
 		}
@@ -117,14 +117,14 @@ var spliceRegexp = regexp.MustCompile(fmt.Sprintf(
 var swapRegexp = regexp.MustCompile(fmt.Sprintf(
 	"(?m)(?:^|,)(%s)%s", jsvarStr, swapStr))
 
-func getSigTokens(htmlPlayerFile string) ([]string, error) {
+func (c *Client) getSigTokens(htmlPlayerFile string) ([]string, error) {
 	u, _ := url.Parse(youtubeBaseURL)
 	p, err := url.Parse(htmlPlayerFile)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := httpGetAndCheckResponseReadBody(u.ResolveReference(p).String())
+	body, err := c.httpGetAndCheckResponseReadBody(u.ResolveReference(p).String())
 	if err != nil {
 		return nil, fmt.Errorf("Error fetching signature tokens: %w", err)
 	}
