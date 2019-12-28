@@ -474,4 +474,59 @@ var ITAGS = []Itag{
 		Itag:          151,
 		AudioBitrate:  24,
 	},
+
+	394: {
+		Itag:          394,
+		Extension:     "mp4",
+		Resolution:    "144p",
+		VideoEncoding: "AV1",
+	},
+	395: {
+		Itag:          395,
+		Extension:     "mp4",
+		Resolution:    "240p",
+		VideoEncoding: "AV1",
+	},
+	396: {
+		Itag:          396,
+		Extension:     "mp4",
+		Resolution:    "360p",
+		VideoEncoding: "AV1",
+	},
+	397: {
+		Itag:          397,
+		Extension:     "mp4",
+		Resolution:    "480p",
+		VideoEncoding: "AV1",
+	},
+	398: {
+		Itag:          398,
+		Extension:     "mp4",
+		Resolution:    "720p",
+		VideoEncoding: "AV1",
+	},
+	399: {
+		Itag:          399,
+		Extension:     "mp4",
+		Resolution:    "1080p",
+		VideoEncoding: "AV1",
+	},
+	400: {
+		Itag:          400,
+		Extension:     "mp4",
+		Resolution:    "1440p",
+		VideoEncoding: "AV1",
+	},
+	401: {
+		Itag:          401,
+		Extension:     "mp4",
+		Resolution:    "2160p",
+		VideoEncoding: "AV1",
+	},
+	402: {
+		Itag:          402,
+		Extension:     "mp4",
+		Resolution:    "2880p",
+		VideoEncoding: "AV1",
+	},
 }
