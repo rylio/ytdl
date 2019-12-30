@@ -70,7 +70,7 @@ func GetVideoInfoFromURL(u *url.URL) (*VideoInfo, error) {
 // GetVideoInfoFromShortURL fetches video info from a short youtube url
 func extractVideoID(u *url.URL) string {
 	switch u.Host {
-	case "www.youtube.com", "youtube.com":
+	case "www.youtube.com", "youtube.com", "m.youtube.com":
 		if u.Path == "/watch" {
 			return u.Query().Get("v")
 		}
