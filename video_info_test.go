@@ -124,7 +124,9 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 
 func TestExtractIDfromValidURL(t *testing.T) {
 	tests := []string{
+		"http://youtube.com/watch?v=BaW_jenozKc",
 		"https://youtube.com/watch?v=BaW_jenozKc",
+		"https://m.youtube.com/watch?v=BaW_jenozKc",
 		"https://www.youtube.com/watch?v=BaW_jenozKc",
 		"https://www.youtube.com/watch?v=BaW_jenozKc&v=UxxajLWwzqY",
 		"https://www.youtube.com/embed/BaW_jenozKc?list=PLEbnTDJUr_IegfoqO4iPnPYQui46QqT0j",
