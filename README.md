@@ -18,17 +18,22 @@ import (
 	"os"
 
 	"github.com/rylio/ytdl"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	vid, err := ytdl.GetVideoInfo("https://www.youtube.com/watch?v=WkVvG4QTO9M")
+	client := ytdl.Client{
+        	HTTPClient: http.DefaultClient,
+        	Logger:     log.Logger,
+ 	}
+	vid, err := client.GetVideoInfo("https://www.youtube.com/watch?v=WkVvG4QTO9M")
 	if err != nil {
 		fmt.Println("Failed to get video info")
 		return
 	}
 	file, _ := os.Create(vid.Title + ".mp4")
 	defer file.Close()
-	vid.Download(vid.Formats[0], file)
+	client.Download(vid, vid.Formats[0], file)
 }
 
 ```
