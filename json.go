@@ -51,6 +51,8 @@ type playerResponse struct {
 		ExpiresInSeconds string       `json:"expiresInSeconds"`
 		Formats          []formatInfo `json:"formats"`
 		AdaptiveFormats  []formatInfo `json:"adaptiveFormats"`
+		DashManifestUrl  string       `json:"dashManifestUrl"`
+		HlsManifestUrl   string       `json:"hlsManifestUrl"`
 	} `json:"streamingData"`
 
 	VideoDetails struct {

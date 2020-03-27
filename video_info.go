@@ -30,7 +30,8 @@ type VideoInfo struct {
 	Description     string     // The video description
 	DatePublished   time.Time  // The date the video was published
 	Formats         FormatList // Formats the video is available in
-	DashManifestURL string     // URI of the DASH manifest file
+	DASHManifestURL string     // URI of the DASH manifest file
+	HLSManifestURL  string     // URI of the HLS manifest file
 	Keywords        []string   // List of keywords associated with the video
 	Uploader        string     // Author of the video
 	Song            string
@@ -168,6 +169,7 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		if err != nil {
 			return nil, err
 		}
+		//glog.Errorf("jsonCOnfig %s\n\n", jsonConfig.Args.PlayerResponse)
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
@@ -231,7 +233,8 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		if err := json.Unmarshal([]byte(inf.PlayerResponse), &response); err != nil {
 			return nil, fmt.Errorf("Couldn't parse player response: %w", err)
 		}
-
+		info.DASHManifestURL = response.StreamingData.DashManifestUrl
+		info.HLSManifestURL = response.StreamingData.HlsManifestUrl
 		if response.PlayabilityStatus.Status != "OK" {
 			return nil, fmt.Errorf("Unavailable because: %s", response.PlayabilityStatus.Reason)
 		}
@@ -262,22 +265,20 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	if len(formats) == 0 {
 		log.Debug().Msgf("No formats found")
 	}
-
-	if info.DashManifestURL = inf.Dashmpd; info.DashManifestURL != "" {
+	if dashManifest := inf.Dashmpd; dashManifest != "" {
 		tokens, err := c.getSigTokens(cx, info.htmlPlayerFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
 		}
 		regex := regexp.MustCompile("\\/s\\/([a-fA-F0-9\\.]+)")
 		regexSub := regexp.MustCompile("([a-fA-F0-9\\.]+)")
-		info.DashManifestURL = regex.ReplaceAllStringFunc(info.DashManifestURL, func(str string) string {
+		info.DASHManifestURL = regex.ReplaceAllStringFunc(dashManifest, func(str string) string {
 			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
 		})
-		dashFormats, err := c.getDashManifest(cx, info.DashManifestURL)
+		dashFormats, err := c.getDashManifest(cx, info.DASHManifestURL)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
 		}
-
 		for _, dashFormat := range dashFormats {
 			added := false
 			for j, format := range formats {
@@ -293,7 +294,6 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		}
 	}
 	info.Formats = formats
-
 	return info, nil
 }
 
