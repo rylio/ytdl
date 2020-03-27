@@ -1,6 +1,7 @@
 package ytdl
 
 import (
+	"context"
 	"io/ioutil"
 	"net/url"
 	"testing"
@@ -104,7 +105,7 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 	for _, tt := range tests {
 		t.Run(tt.url, func(t *testing.T) {
 			client := newTestClient(t)
-			info, err := client.GetVideoInfo(tt.url)
+			info, err := client.GetVideoInfo(context.Background(), tt.url)
 
 			tt.assertion(t, err == nil)
 
@@ -159,7 +160,7 @@ func TestGetDownloadURL(t *testing.T) {
 	for _, id := range testCases {
 		t.Run(id, func(t *testing.T) {
 			client := newTestClient(t)
-			info, err := client.GetVideoInfo("https://www.youtube.com/watch?v=" + id)
+			info, err := client.GetVideoInfo(context.Background(), "https://www.youtube.com/watch?v="+id)
 			require.NoError(t, err)
 
 			if len(info.Formats) == 0 {
@@ -167,7 +168,7 @@ func TestGetDownloadURL(t *testing.T) {
 			}
 
 			format := info.Formats.Worst(FormatResolutionKey)[0]
-			_, err = client.GetDownloadURL(info, format)
+			_, err = client.GetDownloadURL(context.Background(), info, format)
 			assert.NoError(t, err)
 		})
 	}
@@ -175,12 +176,12 @@ func TestGetDownloadURL(t *testing.T) {
 
 func TestDownloadVideo(t *testing.T) {
 	client := newTestClient(t)
-	info, err := client.GetVideoInfo("https://www.youtube.com/watch?v=FrG4TEcSuRg")
+	info, err := client.GetVideoInfo(context.Background(), "https://www.youtube.com/watch?v=FrG4TEcSuRg")
 	if err != nil {
 		t.Fatal(err)
 	}
 	format := info.Formats.Worst(FormatResolutionKey)[0]
-	err = client.Download(info, format, ioutil.Discard)
+	err = client.Download(context.Background(), info, format, ioutil.Discard)
 	if err != nil {
 		t.Error(err)
 	}
@@ -188,7 +189,7 @@ func TestDownloadVideo(t *testing.T) {
 
 func TestThumbnail(t *testing.T) {
 	client := newTestClient(t)
-	info, err := client.GetVideoInfo("https://www.youtube.com/watch?v=FrG4TEcSuRg")
+	info, err := client.GetVideoInfo(context.Background(), "https://www.youtube.com/watch?v=FrG4TEcSuRg")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +205,7 @@ func TestThumbnail(t *testing.T) {
 	for _, v := range qualities {
 		u := info.GetThumbnailURL(v)
 
-		resp, err := client.httpGetAndCheckResponse(u.String())
+		resp, err := client.httpGetAndCheckResponse(context.Background(), u.String())
 		if err != nil {
 			t.Error(err)
 		}

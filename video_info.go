@@ -3,6 +3,7 @@ package ytdl
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -40,29 +41,28 @@ type VideoInfo struct {
 }
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
-func GetVideoInfo(value interface{}) (*VideoInfo, error) {
-	return DefaultClient.GetVideoInfo(value)
+func GetVideoInfo(cx context.Context, value interface{}) (*VideoInfo, error) {
+	return DefaultClient.GetVideoInfo(cx, value)
 }
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
-func (c *Client) GetVideoInfo(value interface{}) (*VideoInfo, error) {
+func (c *Client) GetVideoInfo(cx context.Context, value interface{}) (*VideoInfo, error) {
 	switch t := value.(type) {
 	case *url.URL:
 		videoID := extractVideoID(t)
 		if len(videoID) == 0 {
 			return nil, fmt.Errorf("invalid youtube URL, no video id")
 		}
-		return c.GetVideoInfoFromID(videoID)
+		return c.GetVideoInfoFromID(cx, videoID)
 	case string:
 		if strings.HasPrefix(t, "https://") {
 			uri, err := url.ParseRequestURI(t)
 			if err != nil {
 				return nil, err
 			}
-			return c.GetVideoInfo(uri)
+			return c.GetVideoInfo(cx, uri)
 		}
-
-		return c.GetVideoInfoFromID(t)
+		return c.GetVideoInfoFromID(cx, t)
 	default:
 		return nil, fmt.Errorf("Identifier type must be a string, *url.URL, or []byte")
 	}
@@ -87,18 +87,18 @@ func extractVideoID(u *url.URL) string {
 }
 
 // GetVideoInfoFromID fetches video info from a youtube video id
-func (c *Client) GetVideoInfoFromID(id string) (*VideoInfo, error) {
-	body, err := c.httpGetAndCheckResponseReadBody(youtubeBaseURL + "?v=" + id)
+func (c *Client) GetVideoInfoFromID(cx context.Context, id string) (*VideoInfo, error) {
+	body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeBaseURL+"?v="+id)
 
 	if err != nil {
 		return nil, err
 	}
-	return c.getVideoInfoFromHTML(id, body)
+	return c.getVideoInfoFromHTML(cx, id, body)
 }
 
 // GetDownloadURL gets the download url for a format
-func (c *Client) GetDownloadURL(info *VideoInfo, format *Format) (*url.URL, error) {
-	return c.getDownloadURL(format, info.htmlPlayerFile)
+func (c *Client) GetDownloadURL(cx context.Context, info *VideoInfo, format *Format) (*url.URL, error) {
+	return c.getDownloadURL(cx, format, info.htmlPlayerFile)
 }
 
 // GetThumbnailURL returns a url for the thumbnail image
@@ -110,13 +110,13 @@ func (info *VideoInfo) GetThumbnailURL(quality ThumbnailQuality) *url.URL {
 }
 
 // Download is a convenience method to download a format to an io.Writer
-func (c *Client) Download(info *VideoInfo, format *Format, dest io.Writer) error {
-	u, err := c.GetDownloadURL(info, format)
+func (c *Client) Download(cx context.Context, info *VideoInfo, format *Format, dest io.Writer) error {
+	u, err := c.GetDownloadURL(cx, info, format)
 	if err != nil {
 		return err
 	}
 
-	resp, err := c.httpGetAndCheckResponse(u.String())
+	resp, err := c.httpGetAndCheckResponse(cx, u.String())
 	if err != nil {
 		return err
 	}
@@ -132,7 +132,7 @@ var (
 	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
 )
 
-func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
+func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte) (*VideoInfo, error) {
 	info := &VideoInfo{}
 
 	if matches := regexpInitialData.FindSubmatch(html); len(matches) > 0 {
@@ -170,7 +170,7 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
-		info, err := c.getVideoInfoFromEmbedded(id)
+		info, err := c.getVideoInfoFromEmbedded(cx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -182,8 +182,7 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 		if sts, ok := info["sts"].(float64); ok {
 			query.Add("sts", strconv.Itoa(int(sts)))
 		}
-
-		body, err := c.httpGetAndCheckResponseReadBody(youtubeVideoInfoURL + "?" + query.Encode())
+		body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeVideoInfoURL+"?"+query.Encode())
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read video info: %w", err)
 		}
@@ -264,7 +263,7 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 	}
 
 	if dashManifestURL := inf.Dashmpd; dashManifestURL != "" {
-		tokens, err := c.getSigTokens(info.htmlPlayerFile)
+		tokens, err := c.getSigTokens(cx, info.htmlPlayerFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
 		}
@@ -273,7 +272,7 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 		dashManifestURL = regex.ReplaceAllStringFunc(dashManifestURL, func(str string) string {
 			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
 		})
-		dashFormats, err := c.getDashManifest(dashManifestURL)
+		dashFormats, err := c.getDashManifest(cx, dashManifestURL)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
 		}
@@ -318,10 +317,10 @@ func (c *Client) addFormatsByQueryStrings(formats *FormatList, rd io.Reader, ada
 	}
 }
 
-func (c *Client) getVideoInfoFromEmbedded(id string) (map[string]interface{}, error) {
+func (c *Client) getVideoInfoFromEmbedded(cx context.Context, id string) (map[string]interface{}, error) {
 	var jsonConfig map[string]interface{}
 
-	html, err := c.httpGetAndCheckResponseReadBody(youtubeEmbeddedBaseURL + id)
+	html, err := c.httpGetAndCheckResponseReadBody(cx, youtubeEmbeddedBaseURL+id)
 
 	if err != nil {
 		return nil, fmt.Errorf("Embedded url request returned %w", err)
@@ -343,9 +342,9 @@ func (c *Client) getVideoInfoFromEmbedded(id string) (map[string]interface{}, er
 	return jsonConfig, nil
 }
 
-func (c *Client) getDashManifest(urlString string) (formats []*Format, err error) {
+func (c *Client) getDashManifest(cx context.Context, urlString string) (formats []*Format, err error) {
 
-	resp, err := c.httpGetAndCheckResponse(urlString)
+	resp, err := c.httpGetAndCheckResponse(cx, urlString)
 	if err != nil {
 		return nil, err
 	}

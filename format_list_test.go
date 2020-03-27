@@ -188,7 +188,8 @@ func TestParseStreamList(t *testing.T) {
 	defer file.Close()
 
 	formats := FormatList{}
-	client.addFormatsByQueryStrings(&formats, file)
+	const adaptive = false
+	client.addFormatsByQueryStrings(&formats, file, adaptive)
 
 	require.Len(formats, 2)
 	format := formats[0]
@@ -204,6 +205,7 @@ func TestParseStreamList(t *testing.T) {
 func TestParseStreamListEmpty(t *testing.T) {
 	client := newTestClient(t)
 	formats := FormatList{}
-	client.addFormatsByQueryStrings(&formats, strings.NewReader(""))
+	const adaptive = false
+	client.addFormatsByQueryStrings(&formats, strings.NewReader(""), adaptive)
 	assert.Len(t, formats, 0)
 }
