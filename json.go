@@ -1,6 +1,8 @@
 package ytdl
 
-import "strings"
+import (
+	"strings"
+)
 
 type playerConfig struct {
 	Assets struct {
@@ -35,6 +37,8 @@ type formatInfo struct {
 	AudioChannels    int     `json:"audioChannels"`
 	Cipher           *string `json:"cipher"`
 	URL              string  `json:"url"`
+	Index            *Range  `json:"indexRange,omitempty"`
+	Init             *Range  `json:"initRange,omitempty"`
 }
 
 type playerResponse struct {

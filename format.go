@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // FormatKey is a string type containing a key in a video format map
@@ -20,15 +21,22 @@ const (
 	FormatFPSKey           FormatKey = "fps"
 )
 
+type Range struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
+}
+
 type Format struct {
 	Itag
-
-	url    string
-	s      string
-	sig    string
-	stream string
-	conn   string
-	sp     string
+	Adaptive bool
+	Index    *Range
+	Init     *Range
+	url      string
+	s        string
+	sig      string
+	stream   string
+	conn     string
+	sp       string
 }
 
 func parseFormat(queryString string) (*Format, error) {
@@ -65,9 +73,27 @@ func parseFormat(queryString string) (*Format, error) {
 			format.conn = v[0]
 		case "sp":
 			format.sp = v[0]
+		case "index":
+			format.Index, err = parseRange(v[0])
+			if err != nil {
+				return nil, fmt.Errorf("unable to parse index range")
+			}
+		case "init":
+			format.Init, err = parseRange(v[0])
+			if err != nil {
+				return nil, fmt.Errorf("unable to parse init range")
+			}
 		}
 	}
 	return &format, nil
+}
+
+func parseRange(s string) (*Range, error) {
+	sa := strings.Split(s, "-")
+	if len(sa) != 2 {
+		return nil, fmt.Errorf("Invalid range")
+	}
+	return &Range{Start: sa[0], End: sa[1]}, nil
 }
 
 // ValueForKey gets the format value for a format key, used for filtering
