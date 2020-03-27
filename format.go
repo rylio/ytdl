@@ -29,6 +29,9 @@ type Range struct {
 type Format struct {
 	Itag
 	Adaptive bool
+	// FromDASH indicates that the stream
+	// was extracted from the DASH manifest file
+	FromDASH bool
 	Index    *Range
 	Init     *Range
 	url      string

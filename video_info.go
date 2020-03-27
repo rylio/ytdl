@@ -25,19 +25,20 @@ const youtubeDateFormat = "2006-01-02"
 
 // VideoInfo contains the info a youtube video
 type VideoInfo struct {
-	ID             string     // The video ID
-	Title          string     // The video title
-	Description    string     // The video description
-	DatePublished  time.Time  // The date the video was published
-	Formats        FormatList // Formats the video is available in
-	Keywords       []string   // List of keywords associated with the video
-	Uploader       string     // Author of the video
-	Song           string
-	Artist         string
-	Album          string
-	Writers        string
-	Duration       time.Duration // Duration of the video
-	htmlPlayerFile string
+	ID              string     // The video ID
+	Title           string     // The video title
+	Description     string     // The video description
+	DatePublished   time.Time  // The date the video was published
+	Formats         FormatList // Formats the video is available in
+	DashManifestURL string     // URI of the DASH manifest file
+	Keywords        []string   // List of keywords associated with the video
+	Uploader        string     // Author of the video
+	Song            string
+	Artist          string
+	Album           string
+	Writers         string
+	Duration        time.Duration // Duration of the video
+	htmlPlayerFile  string
 }
 
 // GetVideoInfo fetches info from a url string, url object, or a url string
@@ -262,17 +263,17 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		log.Debug().Msgf("No formats found")
 	}
 
-	if dashManifestURL := inf.Dashmpd; dashManifestURL != "" {
+	if info.DashManifestURL = inf.Dashmpd; info.DashManifestURL != "" {
 		tokens, err := c.getSigTokens(cx, info.htmlPlayerFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
 		}
 		regex := regexp.MustCompile("\\/s\\/([a-fA-F0-9\\.]+)")
 		regexSub := regexp.MustCompile("([a-fA-F0-9\\.]+)")
-		dashManifestURL = regex.ReplaceAllStringFunc(dashManifestURL, func(str string) string {
+		info.DashManifestURL = regex.ReplaceAllStringFunc(info.DashManifestURL, func(str string) string {
 			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
 		})
-		dashFormats, err := c.getDashManifest(cx, dashManifestURL)
+		dashFormats, err := c.getDashManifest(cx, info.DashManifestURL)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
 		}
@@ -361,8 +362,9 @@ func (c *Client) getDashManifest(cx context.Context, urlString string) (formats 
 			}
 			if itag := getItag(rep.Itag); itag != nil {
 				format := &Format{
-					Itag: *itag,
-					url:  rep.URL,
+					Itag:     *itag,
+					url:      rep.URL,
+					FromDASH: true,
 				}
 				if rep.Height != 0 {
 					format.Itag.Resolution = strconv.Itoa(rep.Height) + "p"
