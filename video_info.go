@@ -133,7 +133,6 @@ var (
 )
 
 func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
-
 	info := &VideoInfo{}
 
 	if matches := regexpInitialData.FindSubmatch(html); len(matches) > 0 {
@@ -222,10 +221,10 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 	}
 
 	var formats FormatList
-
-	c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.URLEncodedFmtStreamMap))
-	c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.AdaptiveFmts))
-
+	c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.URLEncodedFmtStreamMap), false)
+	if inf.AdaptiveFmts != "" {
+		c.addFormatsByQueryStrings(&formats, strings.NewReader(inf.AdaptiveFmts), true)
+	}
 	if inf.PlayerResponse != "" {
 		response := &playerResponse{}
 
@@ -237,9 +236,8 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 			return nil, fmt.Errorf("Unavailable because: %s", response.PlayabilityStatus.Reason)
 		}
 
-		c.addFormatsByInfos(&formats, response.StreamingData.Formats)
-		c.addFormatsByInfos(&formats, response.StreamingData.AdaptiveFormats)
-
+		c.addFormatsByInfos(&formats, response.StreamingData.Formats, false)
+		c.addFormatsByInfos(&formats, response.StreamingData.AdaptiveFormats, true)
 		if seconds := response.VideoDetails.LengthSeconds; seconds != "" {
 			val, err := strconv.Atoi(seconds)
 			if err == nil {
@@ -299,25 +297,22 @@ func (c *Client) getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error
 	return info, nil
 }
 
-func (c *Client) addFormatsByInfos(formats *FormatList, infos []formatInfo) {
+func (c *Client) addFormatsByInfos(formats *FormatList, infos []formatInfo, adaptive bool) {
 	for _, info := range infos {
-		if err := formats.addByInfo(info); err != nil {
+		if err := formats.addByInfo(info, adaptive); err != nil {
 			log.Debug().Err(err)
 		}
 	}
 }
 
-func (c *Client) addFormatsByQueryStrings(formats *FormatList, rd io.Reader) {
+func (c *Client) addFormatsByQueryStrings(formats *FormatList, rd io.Reader, adaptive bool) {
 	r := bufio.NewReader(rd)
-
 	for {
 		line, err := r.ReadString(',')
-
 		if err == io.EOF {
 			break
 		}
-
-		if err := formats.addByQueryString(line[:len(line)-1]); err != nil {
+		if err := formats.addByQueryString(line[:len(line)-1], adaptive); err != nil {
 			log.Debug().Err(err)
 		}
 	}

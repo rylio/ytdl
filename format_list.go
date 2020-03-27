@@ -77,7 +77,7 @@ func (formats FormatList) Copy() FormatList {
 	return dst
 }
 
-func (formats *FormatList) addByInfo(info formatInfo) error {
+func (formats *FormatList) addByInfo(info formatInfo, adaptive bool) error {
 	var err error
 	var format *Format
 
@@ -98,18 +98,19 @@ func (formats *FormatList) addByInfo(info formatInfo) error {
 			url:  info.URL,
 		}
 	}
-
+	format.Adaptive = adaptive
+	format.Index = info.Index
+	format.Init = info.Init
 	*formats = append(*formats, format)
 	return nil
 }
 
-func (formats *FormatList) addByQueryString(input string) error {
+func (formats *FormatList) addByQueryString(input string, adaptive bool) error {
 	format, err := parseFormat(input)
-
 	if err != nil {
 		return err
 	}
-
+	format.Adaptive = adaptive
 	*formats = append(*formats, format)
 	return nil
 }
