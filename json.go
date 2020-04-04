@@ -37,8 +37,11 @@ type formatInfo struct {
 	AudioChannels    int     `json:"audioChannels"`
 	Cipher           *string `json:"cipher"`
 	URL              string  `json:"url"`
-	Index            *Range  `json:"indexRange,omitempty"`
-	Init             *Range  `json:"initRange,omitempty"`
+
+	Index  *Range `json:"indexRange,omitempty"`
+	Init   *Range `json:"initRange,omitempty"`
+	Codecs string `json:"codecs,omitempty"`
+	FPS    int    `json:"fps,omitempty"`
 }
 
 type playerResponse struct {

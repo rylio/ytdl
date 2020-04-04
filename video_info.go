@@ -129,7 +129,7 @@ func (c *Client) Download(cx context.Context, info *VideoInfo, format *Format, d
 }
 
 var (
-	regexpPlayerConfig          = regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
+	regexpPlayerConfig          = regexp.MustCompile(`ytplayer.config = (.*?)\};`)
 	regexpInitialData           = regexp.MustCompile(`\["ytInitialData"\] = (.+);`)
 	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
 )
@@ -165,11 +165,11 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 
 	// match json in javascript
 	if matches := regexpPlayerConfig.FindSubmatch(html); len(matches) > 1 {
-		err := json.Unmarshal(matches[1], &jsonConfig)
+		data := append(matches[1], []byte("}")...)
+		err := json.Unmarshal(data, &jsonConfig)
 		if err != nil {
 			return nil, err
 		}
-		//glog.Errorf("jsonCOnfig %s\n\n", jsonConfig.Args.PlayerResponse)
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 

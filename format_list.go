@@ -2,7 +2,9 @@ package ytdl
 
 import (
 	"fmt"
+	"mime"
 	"sort"
+	"strconv"
 )
 
 // FormatList is a slice of formats with filtering functionality
@@ -87,7 +89,7 @@ func (formats *FormatList) addByInfo(info formatInfo, adaptive bool) error {
 	}
 
 	if info.Cipher != nil {
-		format, err = parseFormat(*info.Cipher)
+		format, err = parseFormat(*info.Cipher, adaptive)
 		if err != nil {
 			return fmt.Errorf("unable to parse cipher '%v': %w", info.Cipher, err)
 		}
@@ -99,14 +101,34 @@ func (formats *FormatList) addByInfo(info formatInfo, adaptive bool) error {
 		}
 	}
 	format.Adaptive = adaptive
-	format.Index = info.Index
-	format.Init = info.Init
+	if adaptive && info.Index != nil {
+		format.AdaptiveStream = &AdaptiveStream{
+			Index:             info.Index,
+			Init:              info.Init,
+			Codecs:            info.Codecs,
+			Bitrate:           info.Bitrate,
+			Width:             info.Width,
+			Height:            info.Height,
+			AudioSamplingRate: info.AudioSampleRate,
+			AudioChannels:     info.AudioChannels,
+			FrameRate:         strconv.Itoa(info.FPS),
+		}
+		if info.MimeType != "" {
+			var params map[string]string
+			format.AdaptiveStream.MimeType, params, err = mime.ParseMediaType(info.MimeType)
+			if err != nil {
+				return fmt.Errorf("failed to parse mime type: %s", info.MimeType)
+			}
+			format.AdaptiveStream.Codecs = params["codecs"]
+		}
+	}
+
 	*formats = append(*formats, format)
 	return nil
 }
 
 func (formats *FormatList) addByQueryString(input string, adaptive bool) error {
-	format, err := parseFormat(input)
+	format, err := parseFormat(input, adaptive)
 	if err != nil {
 		return err
 	}
