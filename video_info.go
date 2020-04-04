@@ -129,7 +129,7 @@ func (c *Client) Download(cx context.Context, info *VideoInfo, format *Format, d
 }
 
 var (
-	regexpPlayerConfig          = regexp.MustCompile("ytplayer.config = (.*?);ytplayer.load")
+	regexpPlayerConfig          = regexp.MustCompile("ytplayer.config = (.*?);ytplayer")
 	regexpInitialData           = regexp.MustCompile(`\["ytInitialData"\] = (.+);`)
 	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
 )
