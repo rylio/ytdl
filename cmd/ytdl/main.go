@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,14 +10,13 @@ import (
 	"strconv"
 	"time"
 
-	"encoding/json"
-
 	"github.com/mattn/go-isatty"
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/rylio/ytdl"
 	"github.com/urfave/cli"
+
+	"github.com/rylio/ytdl"
 )
 
 var (
@@ -168,7 +169,7 @@ func handler(identifier string, options options) {
 	log.Info().Msg("Fetching video info...")
 	//fmt.Print("\u001b[0G")
 	//fmt.Print("\u001b[2K")
-	info, err := client.GetVideoInfo(identifier)
+	info, err := client.GetVideoInfo(context.Background(), identifier)
 	if err != nil {
 		err = fmt.Errorf("Unable to fetch video info: %w", err)
 		return
@@ -245,7 +246,7 @@ func handler(identifier string, options options) {
 		return
 	}
 	format := formats[0]
-	downloadURL, err := client.GetDownloadURL(info, format)
+	downloadURL, err := client.GetDownloadURL(context.Background(), info, format)
 	if err != nil {
 		err = fmt.Errorf("Unable to get download url: %w", err)
 		return

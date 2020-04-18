@@ -6,10 +6,12 @@
 *.o
 *.a
 *.so
+/cmd/ytdl/ytdl
 
 # Folders
 _obj
 _test
+.idea
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -33,6 +35,7 @@ _testmain.go
 
 # KDE directory preferences
 .directory
+*.iml
 
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
