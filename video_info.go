@@ -138,7 +138,11 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 	if matches := regexpInitialData.FindSubmatch(html); len(matches) > 0 {
 		data := initialData{}
 
-		if err := json.Unmarshal(matches[1], &data); err != nil {
+		matchString := string(matches[1])
+		matchSplit := strings.Split(matchString, ";ytplayer.web_player_context_config")
+		firstMatch := []byte(matchSplit[0])
+
+		if err := json.Unmarshal(firstMatch, &data); err != nil {
 			return nil, err
 		}
 
@@ -163,7 +167,12 @@ func getVideoInfoFromHTML(id string, html []byte) (*VideoInfo, error) {
 
 	// match json in javascript
 	if matches := regexpPlayerConfig.FindSubmatch(html); len(matches) > 1 {
-		err := json.Unmarshal(matches[1], &jsonConfig)
+
+		matchString := string(matches[1])
+		matchSplit := strings.Split(matchString, ";ytplayer.web_player_context_config")
+		firstMatch := []byte(matchSplit[0])
+
+		err := json.Unmarshal(firstMatch, &jsonConfig)
 		if err != nil {
 			return nil, err
 		}
