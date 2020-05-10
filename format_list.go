@@ -88,13 +88,20 @@ func (formats *FormatList) addByInfo(info formatInfo, adaptive bool) error {
 		return fmt.Errorf("no itag found with number: %v", info.Itag)
 	}
 
-	if info.Cipher != nil {
+	switch {
+	case info.Cipher != nil:
 		format, err = parseFormat(*info.Cipher, adaptive)
 		if err != nil {
 			return fmt.Errorf("unable to parse cipher '%v': %w", info.Cipher, err)
 		}
 		format.Itag = *itag
-	} else {
+	case info.SignatureCipher != nil:
+		format, err = parseFormat(*info.SignatureCipher, adaptive)
+		if err != nil {
+			return fmt.Errorf("unable to parse cipher '%v': %w", info.SignatureCipher, err)
+		}
+		format.Itag = *itag
+	default:
 		format = &Format{
 			Itag: *itag,
 			url:  info.URL,
