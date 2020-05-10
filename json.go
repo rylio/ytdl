@@ -36,6 +36,7 @@ type formatInfo struct {
 	AudioSampleRate  string  `json:"audioSampleRate"`
 	AudioChannels    int     `json:"audioChannels"`
 	Cipher           *string `json:"cipher"`
+	SignatureCipher  *string `json:"signatureCipher"`
 	URL              string  `json:"url"`
 	Index            *Range  `json:"indexRange,omitempty"`
 	Init             *Range  `json:"initRange,omitempty"`
