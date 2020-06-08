@@ -11,33 +11,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Run a single test with:
 func TestVideoInfo(t *testing.T) {
 
 	tests := []struct {
-		url         string
-		assertion   assert.BoolAssertionFunc
-		duration    time.Duration
-		published   time.Time
-		title       string
-		uploader    string
-		description string
-		song        string
-		artist      string
+		url          string
+		errorMessage string
+		duration     time.Duration
+		published    time.Time
+		title        string
+		uploader     string
+		description  string
+		song         string
+		artist       string
 	}{
 		{
-			url:       "https://www.youtube.com/",
-			assertion: assert.False,
+			url:          "https://www.youtube.com/",
+			errorMessage: "invalid youtube URL, no video id",
 		},
 		{
-			url:       "https://www.facebook.com/video.php?v=10153820411888896",
-			assertion: assert.False,
+			url:          "https://www.facebook.com/video.php?v=10153820411888896",
+			errorMessage: "invalid youtube URL, no video id",
 		},
 		//{
 		//	url: "https://www.youtube.com/watch?v=TDgn8k9uyW4",
 		//},
 		{
 			url:         "https://www.youtube.com/watch?v=BaW_jenozKc",
-			assertion:   assert.True,
 			title:       `youtube-dl test video "'/\ä↭𝕐`,
 			uploader:    "Philipp Hagemeister",
 			duration:    time.Second * 10,
@@ -46,16 +46,16 @@ func TestVideoInfo(t *testing.T) {
 		},
 		{
 			url:         "https://www.youtube.com/watch?v=YQHsXMglC9A",
-			assertion:   assert.True,
 			title:       "Adele - Hello",
 			uploader:    "AdeleVEVO",
 			duration:    time.Second * 367,
 			published:   newDate(2015, 10, 22),
+			artist:      "Adele",
+			song:        "Hello",
 			description: "‘Hello' is taken from the new album, 25, out November 20. http://adele.com\nAvailable now from iTunes http://smarturl.it/itunes25 \nAvailable now from Amazon http://smarturl.it/25amazon \nAvailable now from Google Play http://smarturl.it/25gplay\nAvailable now at Target (US Only): http://smarturl.it/target25\n\nDirected by Xavier Dolan, @XDolan\n\nFollow Adele on:\n\nFacebook - https://www.facebook.com/Adele\nTwitter - https://twitter.com/Adele \nInstagram - http://instagram.com/Adele\n\nhttp://vevo.ly/jzAuJ1\n\nCommissioner: Phil Lee\nProduction Company: Believe Media/Sons of Manual/Metafilms\nDirector: Xavier Dolan\nExecutive Producer: Jannie McInnes\nProducer: Nancy Grant/Xavier Dolan\nCinematographer:  André Turpin\nProduction design : Colombe Raby\nEditor: Xavier Dolan\nAdele's lover : Tristan Wilds",
 		},
 		{
 			url:       "https://www.youtube.com/watch?v=H-30B0cqh88",
-			assertion: assert.True,
 			title:     "Kung Fu Panda 3 Official Trailer #3 (2016) - Jack Black, Angelina Jolie Animated Movie HD",
 			uploader:  "Movieclips Trailers",
 			duration:  time.Second * 145,
@@ -67,7 +67,6 @@ func TestVideoInfo(t *testing.T) {
 		// https://github.com/ytdl-org/youtube-dl/issues/956
 		{
 			url:         "https://www.youtube.com/watch?v=07FYdnEawAQ",
-			assertion:   assert.True,
 			title:       `Justin Timberlake - Tunnel Vision (Official Music Video) (Explicit)`,
 			uploader:    "justintimberlakeVEVO",
 			duration:    time.Second * 419,
@@ -77,10 +76,9 @@ func TestVideoInfo(t *testing.T) {
 			description: "Executive Producer: Jeff Nicholas \nProduced by Jonathan Craven and Nathan Scherrer \nDirected by Jonathan Craven, Simon McLoughlin and Jeff Nicholas for The Uprising Creative (http://theuprisingcreative.com) \nDirector Of Photography: Sing Howe Yam \nEditor: Jacqueline London\n\nOfficial music video by Justin Timberlake performing Tunnel Vision (Explicit). (C) 2013 RCA Records, a division of Sony Music Entertainment\n\n#JustinTimberlake #TunnelVision #Vevo #Pop #OfficialMuiscVideo",
 		},
 		{
-			url:       "https://www.youtube.com/watch?v=qHGTs1NSB1s",
-			assertion: assert.True,
-			title:     "Why Linus Torvalds doesn't use Ubuntu or Debian",
-			uploader:  "TFiR: Open Source and Emerging Tech",
+			url:      "https://www.youtube.com/watch?v=qHGTs1NSB1s",
+			title:    "Why Linus Torvalds doesn't use Ubuntu or Debian",
+			uploader: "TFiR",
 			description: `Subscribe to our weekly newsletter: https://www.tfir.io/dnl
 Become a patron of this channel: https://www.patreon.com/TFIR
 Follow us on Twitter: https://twitter.com/tfir_io
@@ -93,7 +91,6 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 		// 256k DASH audio (format 141) via DASH manifest
 		{
 			url:         "https://www.youtube.com/watch?v=a9LDPn-MO4I",
-			assertion:   assert.True,
 			title:       "UHDTV TEST 8K VIDEO.mp4",
 			uploader:    "8KVIDEO",
 			description: "",
@@ -104,19 +101,23 @@ Linus gives the practical reasons why he doesn't use Ubuntu or Debian.`,
 
 	for _, tt := range tests {
 		t.Run(tt.url, func(t *testing.T) {
+			assert := assert.New(t)
 			client := newTestClient(t)
 			info, err := client.GetVideoInfo(context.Background(), tt.url)
 
-			tt.assertion(t, err == nil)
-
-			if err == nil {
-				assert.Equal(t, tt.duration, info.Duration)
-				assert.Equal(t, tt.title, info.Title)
-				assert.Equal(t, tt.published, info.DatePublished)
-				assert.Equal(t, tt.uploader, info.Uploader)
-				assert.Equal(t, tt.song, info.Song)
-				assert.Equal(t, tt.artist, info.Artist)
-				assert.Equal(t, tt.description, info.Description)
+			if tt.errorMessage != "" {
+				// we expect an error
+				assert.EqualError(err, tt.errorMessage)
+			} else {
+				if assert.NoError(err) {
+					assert.Equal(tt.duration, info.Duration, "Duration mismatch")
+					assert.Equal(tt.title, info.Title, "Title mismatch")
+					assert.Equal(tt.published, info.DatePublished, "DatePublished mismatch")
+					assert.Equal(tt.uploader, info.Uploader, "Uploader mismatch")
+					assert.Equal(tt.song, info.Song, "Song mismatch")
+					assert.Equal(tt.artist, info.Artist, "Artist mismatch")
+					assert.Equal(tt.description, info.Description, "Description mismatch")
+				}
 			}
 		})
 	}
@@ -194,6 +195,9 @@ func TestThumbnail(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	ctx := context.Background()
+
+	// test valid thumnail qualities
 	qualities := []ThumbnailQuality{
 		ThumbnailQualityDefault,
 		ThumbnailQualityHigh,
@@ -201,16 +205,23 @@ func TestThumbnail(t *testing.T) {
 		ThumbnailQualityMedium,
 		ThumbnailQualitySD,
 	}
-
 	for _, v := range qualities {
-		u := info.GetThumbnailURL(v)
+		t.Run(string(v), func(t *testing.T) {
+			u := info.GetThumbnailURL(v)
+			resp, err := client.httpGetAndCheckResponse(ctx, u.String())
 
-		resp, err := client.httpGetAndCheckResponse(context.Background(), u.String())
-		if err != nil {
-			t.Error(err)
-		}
-		resp.Body.Close()
+			if assert.NoError(t, err) {
+				resp.Body.Close()
+			}
+		})
 	}
+
+	// test invalid thumbnail quality
+	t.Run("invalid", func(t *testing.T) {
+		u := info.GetThumbnailURL(ThumbnailQuality("invalid"))
+		_, err = client.httpGetAndCheckResponse(ctx, u.String())
+		assert.EqualError(t, err, "unexpected status code: 404")
+	})
 }
 
 func newDate(y, m, d int) time.Time {

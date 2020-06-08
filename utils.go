@@ -7,6 +7,12 @@ import (
 	"net/http"
 )
 
+type errUnexpectedStatusCode int
+
+func (err errUnexpectedStatusCode) Error() string {
+	return fmt.Sprintf("unexpected status code: %d", err)
+}
+
 func reverseStringSlice(s []string) {
 	for i, j := 0, len(s)-1; i < len(s)/2; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
@@ -35,12 +41,12 @@ func (c *Client) httpGetAndCheckResponse(cx context.Context, url string) (*http.
 
 	resp, err := c.httpGet(cx, url)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
 		resp.Body.Close()
-		return nil, fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+		return nil, errUnexpectedStatusCode(resp.StatusCode)
 	}
 	return resp, nil
 }
