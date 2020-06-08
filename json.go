@@ -1,7 +1,7 @@
 package ytdl
 
 import (
-	"strings"
+	"github.com/antchfx/jsonquery"
 )
 
 type playerConfig struct {
@@ -79,77 +79,17 @@ type representation struct {
 	URL    string `xml:"BaseURL"`
 }
 
-type initialData struct {
-	Contents struct {
-		TwoColumnWatchNextResults struct {
-			Results struct {
-				Results struct {
-					Contents []struct {
-						VideoSecondaryInfoRenderer struct {
-							Owner struct {
-								VideoOwnerRenderer struct {
-									Thumbnail struct {
-										Thumbnails []struct {
-											URL    string `json:"url"`
-											Width  int    `json:"width"`
-											Height int    `json:"height"`
-										} `json:"thumbnails"`
-									} `json:"thumbnail"`
-									Title               Content `json:"title"`
-									SubscriberCountText Content `json:"subscriberCountText"`
-									TrackingParams      string  `json:"trackingParams"`
-								} `json:"videoOwnerRenderer"`
-							} `json:"owner"`
-							Description          Content `json:"description"`
-							MetadataRowContainer struct {
-								MetadataRowContainerRenderer struct {
-									Rows MetadataRows `json:"rows"`
-								} `json:"metadataRowContainerRenderer"`
-							} `json:"metadataRowContainer"`
-						} `json:"videoSecondaryInfoRenderer,omitempty"`
-					} `json:"contents"`
-				} `json:"results"`
-			} `json:"results"`
-		} `json:"twoColumnWatchNextResults"`
-	} `json:"contents"`
-}
+func getMetaDataRow(row *jsonquery.Node) (string, string) {
+	title, _ := jsonquery.Query(row, "title")
+	text, _ := jsonquery.Query(row, "contents//simpleText")
 
-type Content struct {
-	SimpleText *string `json:"simpleText,omitempty"`
-	Lines      []struct {
-		Text string `json:"text,omitempty"`
-	} `json:"runs"`
-}
-
-func (c *Content) String() string {
-	if c.SimpleText != nil {
-		return *c.SimpleText
+	if text == nil {
+		text, _ = jsonquery.Query(row, "contents//text")
 	}
 
-	var sb strings.Builder
-	for i := range c.Lines {
-		sb.WriteString(c.Lines[i].Text)
-	}
-	return sb.String()
-}
-
-type MetadataRows []struct {
-	MetadataRowRenderer struct {
-		Title    Content   `json:"title"`
-		Contents []Content `json:"contents"`
-	} `json:"metadataRowRenderer,omitempty"`
-}
-
-func (rows MetadataRows) Get(title string) string {
-	for i := range rows {
-		row := &rows[i]
-
-		if row.MetadataRowRenderer.Title.String() == title {
-			if contents := row.MetadataRowRenderer.Contents; len(contents) > 0 {
-				return contents[0].String()
-			}
-		}
+	if title == nil || text == nil {
+		return "", ""
 	}
 
-	return ""
+	return title.InnerText(), text.InnerText()
 }

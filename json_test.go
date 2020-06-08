@@ -1,8 +1,7 @@
 package ytdl
 
 import (
-	"encoding/json"
-	"os"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,20 +12,12 @@ func TestMetadataRows(t *testing.T) {
 	require := require.New(t)
 	assert := assert.New(t)
 
-	file, err := os.Open("fixtures/metadata_rows.json")
+	jsondata, err := ioutil.ReadFile("fixtures/metadata_rows.json")
 	require.NoError(err)
-	defer file.Close()
 
-	data := initialData{}
-	require.NoError(json.NewDecoder(file).Decode(&data))
+	info := VideoInfo{}
+	require.NoError(info.addMetadata(jsondata))
 
-	contents := data.Contents.TwoColumnWatchNextResults.Results.Results.Contents
-	require.Len(contents, 3)
-
-	rows := contents[1].VideoSecondaryInfoRenderer.MetadataRowContainer.MetadataRowContainerRenderer.Rows
-	require.Len(rows, 9)
-
-	assert.Equal("Notice", rows[0].MetadataRowRenderer.Title.String())
-	assert.Equal("Justin Timberlake", rows.Get("Artist"))
-	assert.Equal("Tunnel Vision", rows.Get("Song"))
+	assert.Equal("Justin Timberlake", info.Artist)
+	assert.Equal("Tunnel Vision", info.Song)
 }

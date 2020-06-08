@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/antchfx/jsonquery"
 	"github.com/rs/zerolog/log"
 )
 
@@ -130,6 +131,7 @@ func (c *Client) Download(cx context.Context, info *VideoInfo, format *Format, d
 
 var (
 	regexpPlayerConfig          = regexp.MustCompile("ytplayer\\.config = (.*?);ytplayer\\.")
+	regexpPlayerConfigEmbedded  = regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
 	regexpInitialData           = regexp.MustCompile(`\["ytInitialData"\] = (.+);`)
 	regexpInitialPlayerResponse = regexp.MustCompile(`\["ytInitialPlayerResponse"\] = (.+);`)
 )
@@ -138,24 +140,8 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	info := &VideoInfo{}
 
 	if matches := regexpInitialData.FindSubmatch(html); len(matches) > 0 {
-		data := initialData{}
-
-		if err := json.Unmarshal(matches[1], &data); err != nil {
-			return nil, err
-		}
-
-		contents := data.Contents.TwoColumnWatchNextResults.Results.Results.Contents
-
-		if len(contents) >= 2 {
-			infoRenderer := contents[1].VideoSecondaryInfoRenderer
-
-			info.Description = infoRenderer.Description.String()
-			rows := infoRenderer.MetadataRowContainer.MetadataRowContainerRenderer.Rows
-
-			info.Artist = rows.Get("Artist")
-			info.Album = rows.Get("Album")
-			info.Song = rows.Get("Song")
-			info.Writers = rows.Get("Writers")
+		if err := info.addMetadata(matches[1]); err != nil {
+			log.Debug().Msgf("Unable to parse metadata rows: %v", err)
 		}
 	}
 
@@ -169,7 +155,6 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		if err != nil {
 			return nil, err
 		}
-		//glog.Errorf("jsonCOnfig %s\n\n", jsonConfig.Args.PlayerResponse)
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
@@ -297,6 +282,44 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	return info, nil
 }
 
+func (info *VideoInfo) addMetadata(jsondata []byte) error {
+	doc, err := jsonquery.Parse(bytes.NewReader(jsondata))
+	if err != nil {
+		return err
+	}
+
+	// Extract description
+	descr, err := jsonquery.Query(doc, "//videoSecondaryInfoRenderer/description")
+	if err != nil {
+		return err
+	}
+	if descr != nil {
+		var sb strings.Builder
+		for _, child := range jsonquery.Find(descr, "//text") {
+			sb.WriteString(child.InnerText())
+		}
+		info.Description = sb.String()
+	}
+
+	// Extract metadata rows
+	rows := jsonquery.Find(doc, "//metadataRowContainer/*/rows/*/metadataRowRenderer")
+	for _, row := range rows {
+		key, value := getMetaDataRow(row)
+
+		switch key {
+		case "Artist":
+			info.Artist = value
+		case "Song":
+			info.Song = value
+		case "Album":
+			info.Album = value
+		case "Writers":
+			info.Writers = value
+		}
+	}
+	return nil
+}
+
 func (c *Client) addFormatsByInfos(formats *FormatList, infos []formatInfo, adaptive bool) {
 	for _, info := range infos {
 		if err := formats.addByInfo(info, adaptive); err != nil {
@@ -327,10 +350,7 @@ func (c *Client) getVideoInfoFromEmbedded(cx context.Context, id string) (map[st
 		return nil, fmt.Errorf("Embedded url request returned %w", err)
 	}
 
-	//	re = regexp.MustCompile("\"sts\"\\s*:\\s*(\\d+)")
-	re := regexp.MustCompile("yt.setConfig\\({'PLAYER_CONFIG': (.*?)}\\);")
-
-	matches := re.FindSubmatch(html)
+	matches := regexpPlayerConfigEmbedded.FindSubmatch(html)
 	if len(matches) < 2 {
 		return nil, fmt.Errorf("Error extracting sts from embedded url response")
 	}
