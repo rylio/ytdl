@@ -3,6 +3,7 @@
 Go library for downloading YouTube videos
 
 [![Documentation](https://godoc.org/github.com/rylio/ytdl?status.svg)](http://godoc.org/github.com/rylio/ytdl)
+[![Build Status](https://github.com/rylio/ytdl/workflows/build/badge.svg?branch=master)](https://github.com/rylio/ytdl/actions)
 [![Codecov](https://codecov.io/gh/rylio/ytdl/branch/master/graph/badge.svg)](https://codecov.io/gh/rylio/ytdl)
 [![Go ReportCard](http://goreportcard.com/badge/rylio/ytdl)](http://goreportcard.com/report/rylio/ytdl)
 
