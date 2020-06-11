@@ -42,6 +42,11 @@ type Format struct {
 	sp       string
 }
 
+// URL returns Format.url
+func (f *Format) URL() string {
+	return f.url
+}
+
 func parseFormat(queryString string) (*Format, error) {
 	query, err := url.ParseQuery(queryString)
 	if err != nil {
