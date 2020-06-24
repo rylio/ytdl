@@ -14,7 +14,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/rylio/ytdl"
 )
@@ -49,48 +49,48 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.HelpFlag,
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "output, o",
 			Usage: "Write output to a file, passing - outputs to stdout",
 			Value: "{{.Title}}.{{.Ext}}",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "info, i",
 			Usage: "Only output video info",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "silent, s",
 			Usage: "Only output errors, also disables progress bar",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "debug, d",
 			Usage: "Output debug log",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "append, a",
 			Usage: "Append to output file instead of overwriting",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "filter, f",
 			Usage: "Filter available formats, syntax: [format_key]:val1,val2",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "range, r",
 			Usage: "Download a specific range of bytes of the video, [start]-[end]",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "download-url, u",
 			Usage: "Prints download url to stdout",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "json, j",
 			Usage: "Print info json to stdout",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "start-offset",
 			Usage: "Offset the start of the video by time",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "download-option, p",
 			Usage: "Print video and audio download options",
 		},
@@ -115,7 +115,7 @@ func main() {
 				downloadOption: c.Bool("download-option"),
 			}
 			if len(options.filters) == 0 {
-				options.filters = cli.StringSlice{
+				options.filters = []string{
 					fmt.Sprintf("%s:mp4", ytdl.FormatExtensionKey),
 					fmt.Sprintf("!%s:", ytdl.FormatVideoEncodingKey),
 					fmt.Sprintf("!%s:", ytdl.FormatAudioEncodingKey),
