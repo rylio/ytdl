@@ -23,12 +23,12 @@ func interfaceToString(val interface{}) string {
 	return fmt.Sprintf("%v", val)
 }
 
-func (c *Client) httpGet(cx context.Context, url string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", url, nil)
+func (c *Client) httpGet(ctx context.Context, url string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(cx)
+
 	// Youtube responses depend on language and user agent
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0")
@@ -36,10 +36,10 @@ func (c *Client) httpGet(cx context.Context, url string) (*http.Response, error)
 	return c.HTTPClient.Do(req)
 }
 
-func (c *Client) httpGetAndCheckResponse(cx context.Context, url string) (*http.Response, error) {
+func (c *Client) httpGetAndCheckResponse(ctx context.Context, url string) (*http.Response, error) {
 	c.Logger.Debug().Msgf("Fetching %v", url)
 
-	resp, err := c.httpGet(cx, url)
+	resp, err := c.httpGet(ctx, url)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +51,8 @@ func (c *Client) httpGetAndCheckResponse(cx context.Context, url string) (*http.
 	return resp, nil
 }
 
-func (c *Client) httpGetAndCheckResponseReadBody(cx context.Context, url string) ([]byte, error) {
-	resp, err := c.httpGetAndCheckResponse(cx, url)
+func (c *Client) httpGetAndCheckResponseReadBody(ctx context.Context, url string) ([]byte, error) {
+	resp, err := c.httpGetAndCheckResponse(ctx, url)
 	if err != nil {
 		return nil, err
 	}
