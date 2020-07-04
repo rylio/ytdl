@@ -14,28 +14,32 @@ Go library for downloading YouTube videos
 package main
 
 import (
-	"fmt"
+	"context"
 	"os"
 
 	"github.com/rylio/ytdl"
-	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	client := ytdl.Client{
-        	HTTPClient: http.DefaultClient,
-        	Logger:     log.Logger,
- 	}
-	vid, err := client.GetVideoInfo("https://www.youtube.com/watch?v=WkVvG4QTO9M")
-	if err != nil {
-		fmt.Println("Failed to get video info")
-		return
-	}
-	file, _ := os.Create(vid.Title + ".mp4")
-	defer file.Close()
-	client.Download(vid, vid.Formats[0], file)
-}
+	ctx := context.Background()
+	client := ytdl.DefaultClient
 
+	videoInfo, err := client.GetVideoInfo(ctx, "https://www.youtube.com/watch?v=WkVvG4QTO9M")
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.Create(videoInfo.Title + ".mp4")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	err = client.Download(ctx, videoInfo, videoInfo.Formats[0], file)
+	if err != nil {
+		panic(err)
+	}
+}
 ```
 
 ## ytdl CLI
