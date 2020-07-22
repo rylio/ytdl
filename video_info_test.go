@@ -85,6 +85,18 @@ func TestVideoInfo(t *testing.T) {
 			published:   newDate(2010, 9, 9),
 			description: "SUBSCRIBE: http://www.youtube.com/saturninefilms \r\n\r\nEven Obama has taken a stand against freedom on this issue: http://www.huffingtonpost.com/2010/09...",
 		},
+		// Age restricted video
+		// https://github.com/rylio/ytdl/pull/109
+		{
+			videoID:     "z0NfI2NeDHI",
+			title:       `Rammstein - Radio (Official Video)`,
+			uploader:    "Rammstein Official",
+			artist:      "Rammstein",
+			song:        "RADIO",
+			duration:    time.Second * 290,
+			published:   newDate(2019, 4, 26),
+			description: "New Album: https://rammstein.lnk.to/album\nNew Single: https://rammstein.lnk.to/Radio\n\nDirector: Jörn Heitmann\nProduction Company: Katapult\n\n#Rammstein #RammsteinRadio #Radio",
+		},
 		{
 			videoID:  "qHGTs1NSB1s",
 			title:    "Why Linus Torvalds doesn't use Ubuntu or Debian",
