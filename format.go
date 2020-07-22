@@ -114,6 +114,8 @@ func (f *Format) ValueForKey(key FormatKey) interface{} {
 		return f.AudioEncoding
 	case FormatAudioBitrateKey:
 		return f.AudioBitrate
+	case FormatFPSKey:
+		return f.FPS
 	default:
 		return fmt.Errorf("Unknown format key: %v", key)
 	}

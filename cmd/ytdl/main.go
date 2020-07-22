@@ -198,10 +198,11 @@ func handler(identifier string, options options) {
 		info.Formats.Sort(ytdl.FormatResolutionKey, true)
 		for _, format := range info.Formats {
 			var fps string
-			if format.ValueForKey("fps") == nil {
+			value := format.ValueForKey("fps")
+			if value == nil {
 				fps = "n/a"
 			} else {
-				fps = format.ValueForKey("fps").(string)
+				fps = fmt.Sprintf("%v", value)
 			}
 
 			data = append(data, []string{strconv.Itoa(format.Number), format.Extension, format.Resolution, fps, format.VideoEncoding, format.AudioEncoding, strconv.Itoa(format.AudioBitrate)})
