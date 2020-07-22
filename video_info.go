@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"io"
 	"net/url"
@@ -250,34 +249,7 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	if len(formats) == 0 {
 		log.Debug().Msgf("No formats found")
 	}
-	if dashManifest := inf.Dashmpd; dashManifest != "" {
-		tokens, err := c.getSigTokens(cx, info.htmlPlayerFile)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to extract signature tokens: %w", err)
-		}
-		regex := regexp.MustCompile("\\/s\\/([a-fA-F0-9\\.]+)")
-		regexSub := regexp.MustCompile("([a-fA-F0-9\\.]+)")
-		info.DASHManifestURL = regex.ReplaceAllStringFunc(dashManifest, func(str string) string {
-			return "/signature/" + decipherTokens(tokens, regexSub.FindString(str))
-		})
-		dashFormats, err := c.getDashManifest(cx, info.DASHManifestURL)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to extract dash manifest: %w", err)
-		}
-		for _, dashFormat := range dashFormats {
-			added := false
-			for j, format := range formats {
-				if dashFormat.Itag == format.Itag {
-					formats[j] = dashFormat
-					added = true
-					break
-				}
-			}
-			if !added {
-				formats = append(formats, dashFormat)
-			}
-		}
-	}
+
 	info.Formats = formats
 	return info, nil
 }
@@ -361,42 +333,4 @@ func (c *Client) getVideoInfoFromEmbedded(cx context.Context, id string) (map[st
 	}
 
 	return jsonConfig, nil
-}
-
-func (c *Client) getDashManifest(cx context.Context, urlString string) (formats []*Format, err error) {
-
-	resp, err := c.httpGetAndCheckResponse(cx, urlString)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	dec := xml.NewDecoder(resp.Body)
-	var token xml.Token
-	for ; err == nil; token, err = dec.Token() {
-		if el, ok := token.(xml.StartElement); ok && el.Name.Local == "Representation" {
-			var rep representation
-			err = dec.DecodeElement(&rep, &el)
-			if err != nil {
-				break
-			}
-			if itag := getItag(rep.Itag); itag != nil {
-				format := &Format{
-					Itag:     *itag,
-					url:      rep.URL,
-					FromDASH: true,
-				}
-				if rep.Height != 0 {
-					format.Itag.Resolution = strconv.Itoa(rep.Height) + "p"
-				}
-				formats = append(formats, format)
-			} else {
-				log.Debug().Msgf("No metadata found for itag: %v, skipping...", rep.Itag)
-			}
-		}
-	}
-	if err != io.EOF {
-		return nil, err
-	}
-	return formats, nil
 }
