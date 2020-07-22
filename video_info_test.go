@@ -76,6 +76,15 @@ func TestVideoInfo(t *testing.T) {
 			published:   newDate(2013, 7, 3),
 			description: "Executive Producer: Jeff Nicholas \nProduced by Jonathan Craven and Nathan Scherrer \nDirected by Jonathan Craven, Simon McLoughlin and Jeff Nicholas for The Uprising Creative (http://theuprisingcreative.com) \nDirector Of Photography: Sing Howe Yam \nEditor: Jacqueline London\n\nOfficial music video by Justin Timberlake performing Tunnel Vision (Explicit). (C) 2013 RCA Records, a division of Sony Music Entertainment\n\n#JustinTimberlake #TunnelVision #Vevo #Pop #OfficialMuiscVideo",
 		},
+		// Controversy video
+		{
+			videoID:     "T4XJQO3qol8",
+			title:       `Burning Everyone's Koran`,
+			uploader:    "Amazing Atheist",
+			duration:    time.Second * 219,
+			published:   newDate(2010, 9, 9),
+			description: "SUBSCRIBE: http://www.youtube.com/saturninefilms \r\n\r\nEven Obama has taken a stand against freedom on this issue: http://www.huffingtonpost.com/2010/09...",
+		},
 		{
 			videoID:  "qHGTs1NSB1s",
 			title:    "Why Linus Torvalds doesn't use Ubuntu or Debian",

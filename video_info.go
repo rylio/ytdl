@@ -91,7 +91,7 @@ func extractVideoID(u *url.URL) string {
 
 // GetVideoInfoFromID fetches video info from a youtube video id
 func (c *Client) GetVideoInfoFromID(cx context.Context, id string) (*VideoInfo, error) {
-	body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeBaseURL+"?v="+id)
+	body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeBaseURL+"?v="+id+"&gl=US&hl=en&has_verified=1&bpctr=9999999999")
 
 	if err != nil {
 		return nil, err
