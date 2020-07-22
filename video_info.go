@@ -157,23 +157,18 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
-		infoNew, err := c.getVideoInfoFromEmbedded(cx, id)
+		embeddedInfo, err := c.getPlayerConfigFromEmbedded(cx, id)
 		if err != nil {
 			return nil, err
 		}
 
-		intrface, _ := infoNew["assets"].(map[string]interface{})
-		strngif, _ := intrface["js"].(string)
-		info.htmlPlayerFile = strngif
+		info.htmlPlayerFile = embeddedInfo.Assets.JS
 
 		query := url.Values{
 			"video_id": []string{id},
 			"eurl":     []string{youtubeVideoEURL + id},
 		}
 
-		if sts, ok := infoNew["sts"].(float64); ok {
-			query.Add("sts", strconv.Itoa(int(sts)))
-		}
 		body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeVideoInfoURL+"?"+query.Encode())
 		if err != nil {
 			return nil, fmt.Errorf("Unable to read video info: %w", err)
@@ -320,8 +315,7 @@ func (c *Client) addFormatsByQueryStrings(formats *FormatList, rd io.Reader, ada
 	}
 }
 
-func (c *Client) getVideoInfoFromEmbedded(cx context.Context, id string) (map[string]interface{}, error) {
-	var jsonConfig map[string]interface{}
+func (c *Client) getPlayerConfigFromEmbedded(cx context.Context, id string) (*playerConfig, error) {
 
 	html, err := c.httpGetAndCheckResponseReadBody(cx, youtubeEmbeddedBaseURL+id)
 
@@ -333,11 +327,13 @@ func (c *Client) getVideoInfoFromEmbedded(cx context.Context, id string) (map[st
 	if len(matches) < 2 {
 		return nil, fmt.Errorf("Error extracting sts from embedded url response")
 	}
+
+	config := &playerConfig{}
 	dec := json.NewDecoder(bytes.NewBuffer(matches[1]))
-	err = dec.Decode(&jsonConfig)
+	err = dec.Decode(config)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to extract json from embedded url: %w", err)
 	}
 
-	return jsonConfig, nil
+	return config, nil
 }
