@@ -157,16 +157,21 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 	} else {
 		log.Debug().Msg("Unable to extract json from default url, trying embedded url")
 
-		info, err := c.getVideoInfoFromEmbedded(cx, id)
+		infoNew, err := c.getVideoInfoFromEmbedded(cx, id)
 		if err != nil {
 			return nil, err
 		}
+
+		intrface, _ := infoNew["assets"].(map[string]interface{})
+		strngif, _ := intrface["js"].(string)
+		info.htmlPlayerFile = strngif
+
 		query := url.Values{
 			"video_id": []string{id},
 			"eurl":     []string{youtubeVideoEURL + id},
 		}
 
-		if sts, ok := info["sts"].(float64); ok {
+		if sts, ok := infoNew["sts"].(float64); ok {
 			query.Add("sts", strconv.Itoa(int(sts)))
 		}
 		body, err := c.httpGetAndCheckResponseReadBody(cx, youtubeVideoInfoURL+"?"+query.Encode())
@@ -244,7 +249,9 @@ func (c *Client) getVideoInfoFromHTML(cx context.Context, id string, html []byte
 		log.Debug().Msg("Unable to extract player response JSON")
 	}
 
-	info.htmlPlayerFile = jsonConfig.Assets.JS
+	if info.htmlPlayerFile == "" {
+		info.htmlPlayerFile = jsonConfig.Assets.JS
+	}
 
 	if len(formats) == 0 {
 		log.Debug().Msgf("No formats found")
