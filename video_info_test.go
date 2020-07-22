@@ -71,8 +71,6 @@ func TestVideoInfo(t *testing.T) {
 			uploader:    "justintimberlakeVEVO",
 			duration:    time.Second * 419,
 			published:   newDate(2013, 7, 3),
-			song:        "Tunnel Vision",
-			artist:      "Justin Timberlake",
 			description: "Executive Producer: Jeff Nicholas \nProduced by Jonathan Craven and Nathan Scherrer \nDirected by Jonathan Craven, Simon McLoughlin and Jeff Nicholas for The Uprising Creative (http://theuprisingcreative.com) \nDirector Of Photography: Sing Howe Yam \nEditor: Jacqueline London\n\nOfficial music video by Justin Timberlake performing Tunnel Vision (Explicit). (C) 2013 RCA Records, a division of Sony Music Entertainment\n\n#JustinTimberlake #TunnelVision #Vevo #Pop #OfficialMuiscVideo",
 		},
 		{
