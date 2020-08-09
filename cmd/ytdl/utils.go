@@ -67,6 +67,7 @@ func parseFilter(filterString string) (func(ytdl.FormatList) ytdl.FormatList, er
 
 type outputFileName struct {
 	Title         string
+	Uploader      string
 	Ext           string
 	DatePublished string
 	Resolution    string

@@ -271,6 +271,7 @@ func handler(identifier string, options options) {
 		var fileName string
 		fileName, err = createFileName(options.outputFile, outputFileName{
 			Title:         sanitizeFileNamePart(info.Title),
+			Uploader:      sanitizeFileNamePart(info.Uploader),
 			Ext:           sanitizeFileNamePart(format.Itag.Extension),
 			DatePublished: sanitizeFileNamePart(info.DatePublished.Format("2006-01-02")),
 			Resolution:    sanitizeFileNamePart(format.Itag.Resolution),
